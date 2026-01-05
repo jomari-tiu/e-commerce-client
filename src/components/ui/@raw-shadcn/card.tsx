@@ -1,8 +1,10 @@
 import * as React from 'react';
+import { ReactNode } from 'react';
 
 import { cn } from '@/utils/cn';
 
-const Card = React.forwardRef<
+// Base Card component (for composition API)
+const CardBase = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
@@ -15,6 +17,62 @@ const Card = React.forwardRef<
     {...props}
   />
 ));
+CardBase.displayName = 'CardBase';
+
+// Props-based Card component
+export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  title?: ReactNode;
+  description?: ReactNode;
+  content?: ReactNode;
+  footer?: ReactNode;
+  header?: ReactNode;
+  children?: ReactNode;
+}
+
+const Card = React.forwardRef<HTMLDivElement, CardProps>(
+  (
+    {
+      title,
+      description,
+      content,
+      footer,
+      header,
+      children,
+      className,
+      ...props
+    },
+    ref
+  ) => {
+    // If children are provided without props, use composition API (backward compatible)
+    if (children && !title && !description && !content && !footer && !header) {
+      return (
+        <CardBase ref={ref} className={className} {...props}>
+          {children}
+        </CardBase>
+      );
+    }
+
+    // Props-based API
+    const cardContent = content ?? children;
+    
+    return (
+      <CardBase ref={ref} className={className} {...props}>
+        {(header || title || description) && (
+          <CardHeader>
+            {header || (
+              <>
+                {title && <CardTitle>{title}</CardTitle>}
+                {description && <CardDescription>{description}</CardDescription>}
+              </>
+            )}
+          </CardHeader>
+        )}
+        {cardContent && <CardContent>{cardContent}</CardContent>}
+        {footer && <CardFooter>{footer}</CardFooter>}
+      </CardBase>
+    );
+  }
+);
 Card.displayName = 'Card';
 
 const CardHeader = React.forwardRef<

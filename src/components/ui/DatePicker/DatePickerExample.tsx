@@ -15,6 +15,13 @@ export const DatePickerExample = () => {
   const [restrictedDate, setRestrictedDate] = React.useState<
     Date | undefined
   >();
+  const [customFormatDate, setCustomFormatDate] = React.useState<Date | undefined>();
+  const [weekendDisabledDate, setWeekendDisabledDate] = React.useState<Date | undefined>();
+  const [noClearDate, setNoClearDate] = React.useState<Date | undefined>();
+  const [example1Date, setExample1Date] = React.useState<Date | undefined>();
+  const [example2Date, setExample2Date] = React.useState<Date | undefined>();
+  const [example3Date, setExample3Date] = React.useState<Date | undefined>();
+  const [example4Date, setExample4Date] = React.useState<Date | undefined>();
 
   return (
     <div className="space-y-8 p-6 max-w-2xl">
@@ -108,8 +115,13 @@ export const DatePickerExample = () => {
       {/* Custom Format Example */}
       <div className="space-y-2">
         <h3 className="text-lg font-semibold">Custom Format</h3>
+        <p className="text-sm text-gray-600">
+          Display format: DD/MM/YYYY, Return format: YYYY-MM-DD
+        </p>
         <SingleDatePicker
+          value={customFormatDate}
           onValueChange={(date, formatted) => {
+            setCustomFormatDate(date);
             console.log('Custom format:', { date, formatted });
           }}
           formatOptions={{
@@ -119,13 +131,23 @@ export const DatePickerExample = () => {
           }}
           placeholder="DD/MM/YYYY format"
         />
+        {customFormatDate && (
+          <p className="text-sm text-gray-600">
+            Selected: {customFormatDate.toLocaleDateString()}
+          </p>
+        )}
       </div>
 
-      {/* Disabled Dates Example */}
+      {/* Disabled Weekends Example */}
       <div className="space-y-2">
         <h3 className="text-lg font-semibold">Disabled Weekends</h3>
+        <p className="text-sm text-gray-600">
+          Only weekdays (Monday-Friday) can be selected
+        </p>
         <SingleDatePicker
+          value={weekendDisabledDate}
           onValueChange={(date, formatted) => {
+            setWeekendDisabledDate(date);
             console.log('Weekday only:', { date, formatted });
           }}
           disabledDates={date => {
@@ -134,28 +156,74 @@ export const DatePickerExample = () => {
           }}
           placeholder="Weekdays only"
         />
+        {weekendDisabledDate && (
+          <p className="text-sm text-gray-600">
+            Selected: {weekendDisabledDate.toLocaleDateString()}
+          </p>
+        )}
       </div>
 
       {/* No Clear Button Example */}
       <div className="space-y-2">
         <h3 className="text-lg font-semibold">No Clear Button</h3>
+        <p className="text-sm text-gray-600">
+          Clear button is hidden - selection cannot be cleared via UI
+        </p>
         <SingleDatePicker
+          value={noClearDate}
           onValueChange={(date, formatted) => {
+            setNoClearDate(date);
             console.log('No clear:', { date, formatted });
           }}
           showClear={false}
           placeholder="Cannot clear selection"
         />
+        {noClearDate && (
+          <p className="text-sm text-gray-600">
+            Selected: {noClearDate.toLocaleDateString()}
+          </p>
+        )}
       </div>
 
-      {/* Different Sizes */}
+      {/* Different Examples */}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Different Examples</h3>
-        <div className="flex flex-wrap gap-4">
-          <SingleDatePicker placeholder="Basic DatePicker" />
-          <SingleDatePicker placeholder="Another Example" />
-          <SingleDatePicker placeholder="Third Example" />
-          <SingleDatePicker placeholder="Fourth Example" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <p className="text-sm font-medium">Basic DatePicker</p>
+            <SingleDatePicker
+              value={example1Date}
+              onValueChange={setExample1Date}
+              placeholder="Select a date"
+            />
+          </div>
+          <div className="space-y-2">
+            <p className="text-sm font-medium">With Min Date (Today)</p>
+            <SingleDatePicker
+              value={example2Date}
+              onValueChange={setExample2Date}
+              minDate={new Date()}
+              placeholder="Future dates only"
+            />
+          </div>
+          <div className="space-y-2">
+            <p className="text-sm font-medium">With Max Date (30 days)</p>
+            <SingleDatePicker
+              value={example3Date}
+              onValueChange={setExample3Date}
+              maxDate={addDays(new Date(), 30)}
+              placeholder="Within 30 days"
+            />
+          </div>
+          <div className="space-y-2">
+            <p className="text-sm font-medium">Disabled State</p>
+            <SingleDatePicker
+              value={example4Date}
+              onValueChange={setExample4Date}
+              disabled
+              placeholder="Disabled picker"
+            />
+          </div>
         </div>
       </div>
     </div>

@@ -94,6 +94,7 @@ export const DatePicker = <T extends DatePickerMode = "single">({
   ...props
 }: DatePickerProps<T>) => {
   const [isOpen, setIsOpen] = React.useState(false);
+  const inputRef = React.useRef<HTMLInputElement>(null);
 
   const {
     format: formatString,
@@ -122,14 +123,18 @@ export const DatePicker = <T extends DatePickerMode = "single">({
         ) {
           const range = val as DateRange;
           if (range.from && range.to) {
-            return `${format(range.from, "PPP")} - ${format(range.to, "PPP")}`;
+            const fromFormat = formatString ? formatString.split(" - ")[0]?.trim() || "PPP" : "PPP";
+            const toFormat = formatString ? formatString.split(" - ")[1]?.trim() || "PPP" : "PPP";
+            return `${format(range.from, fromFormat)} - ${format(range.to, toFormat)}`;
           } else if (range.from) {
-            return format(range.from, "PPP");
+            const fromFormat = formatString ? formatString.split(" - ")[0]?.trim() || "PPP" : "PPP";
+            return format(range.from, fromFormat);
           }
         }
 
         if (mode === "multiple" && Array.isArray(val)) {
-          return val.map((date) => format(date, "PPP")).join(", ");
+          const dateFormat = formatString || "PPP";
+          return val.map((date) => format(date, dateFormat)).join(", ");
         }
       } catch (error) {
         console.warn("DatePicker: Error formatting display value:", error);
@@ -254,6 +259,7 @@ export const DatePicker = <T extends DatePickerMode = "single">({
   // Handle clear
   const handleClear = React.useCallback(
     (e: React.MouseEvent) => {
+      e.preventDefault();
       e.stopPropagation();
       if (onValueChange) {
         onValueChange(undefined as DatePickerValue<T>, undefined as any);
@@ -265,19 +271,34 @@ export const DatePicker = <T extends DatePickerMode = "single">({
   const displayValue = value ? formatDisplayValue(value) : "";
   const hasValue = Boolean(displayValue);
 
+  // Sync input value when value prop changes
+  React.useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.value = displayValue;
+    }
+  }, [displayValue]);
+
   return (
     <div className={cn("relative", className)}>
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
-          <div className="relative">
-            <div className="relative flex items-center">
+          <button
+            type="button"
+            disabled={disabled}
+            className={cn(
+              "relative flex items-center w-full text-left bg-transparent border-none p-0",
+              disabled && "cursor-not-allowed"
+            )}
+          >
+            <div className="relative flex items-center w-full">
               <div className="absolute left-3 z-10 flex items-center justify-center text-gray-500 pointer-events-none">
                 <CalendarIcon className="h-4 w-4" />
               </div>
               <input
+                ref={inputRef}
                 readOnly
                 disabled={disabled}
-                value={hasValue ? displayValue : ""}
+                defaultValue={displayValue}
                 placeholder={placeholder || "Pick a date"}
                 className={cn(
                   "flex h-10 py-2 w-full rounded-md border border-gray-300 bg-background text-base ring-offset-background placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50 md:text-sm cursor-pointer",
@@ -286,24 +307,29 @@ export const DatePicker = <T extends DatePickerMode = "single">({
                   !hasValue && "text-muted-foreground",
                   triggerClassName
                 )}
-                onClick={() => !disabled && setIsOpen(true)}
+                tabIndex={-1}
+                onFocus={(e) => e.target.blur()}
                 {...props}
               />
               {hasValue && showClear && !disabled && (
-                <div className="absolute right-3 z-10 flex items-center justify-center">
-                  <X
-                    className="h-4 w-4 opacity-50 hover:opacity-100 transition-opacity cursor-pointer"
-                    onClick={handleClear}
-                  />
-                </div>
+                <button
+                  type="button"
+                  onClick={handleClear}
+                  className="absolute right-3 z-20 flex items-center justify-center hover:bg-gray-100 rounded p-1"
+                  aria-label="Clear selection"
+                  tabIndex={-1}
+                >
+                  <X className="h-4 w-4 opacity-50 hover:opacity-100 transition-opacity" />
+                </button>
               )}
             </div>
-          </div>
+          </button>
         </PopoverTrigger>
         <PopoverContent
           className={cn("w-auto p-0", contentClassName)}
           align={align}
           side={side}
+          onOpenAutoFocus={(e) => e.preventDefault()}
         >
           <Calendar
             mode={mode as any}

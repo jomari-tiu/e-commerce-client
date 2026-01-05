@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Edit, Trash2, Eye } from "lucide-react";
 import { Table } from "./Table";
 import { Badge } from "../badge";
 import { Button } from "../button";
 import { SelectionState } from "./types";
 import { IconMenuDropdown } from "../Dropdown";
+import { Pagination } from "../Pagination";
+import { Select } from "../Select";
 
 type Employee = {
   id: number;
@@ -79,6 +81,106 @@ const employeeData: Employee[] = [
     status: "active",
     hireDate: "2023-02-28",
   },
+  {
+    id: 6,
+    name: "Emma Davis",
+    email: "emma.davis@company.com",
+    department: "Engineering",
+    role: "Backend Developer",
+    salary: 82000,
+    status: "active",
+    hireDate: "2022-07-12",
+  },
+  {
+    id: 7,
+    name: "Robert Taylor",
+    email: "robert.taylor@company.com",
+    department: "Sales",
+    role: "Sales Director",
+    salary: 95000,
+    status: "active",
+    hireDate: "2021-05-03",
+  },
+  {
+    id: 8,
+    name: "Lisa Anderson",
+    email: "lisa.anderson@company.com",
+    department: "Marketing",
+    role: "Content Manager",
+    salary: 68000,
+    status: "active",
+    hireDate: "2022-09-20",
+  },
+  {
+    id: 9,
+    name: "James Martinez",
+    email: "james.martinez@company.com",
+    department: "Engineering",
+    role: "DevOps Engineer",
+    salary: 88000,
+    status: "active",
+    hireDate: "2021-11-15",
+  },
+  {
+    id: 10,
+    name: "Maria Garcia",
+    email: "maria.garcia@company.com",
+    department: "Design",
+    role: "Product Designer",
+    salary: 73000,
+    status: "pending",
+    hireDate: "2023-04-01",
+  },
+  {
+    id: 11,
+    name: "Thomas Lee",
+    email: "thomas.lee@company.com",
+    department: "Engineering",
+    role: "QA Engineer",
+    salary: 71000,
+    status: "active",
+    hireDate: "2022-06-18",
+  },
+  {
+    id: 12,
+    name: "Jennifer White",
+    email: "jennifer.white@company.com",
+    department: "Marketing",
+    role: "SEO Specialist",
+    salary: 66000,
+    status: "active",
+    hireDate: "2023-01-25",
+  },
+  {
+    id: 13,
+    name: "Christopher Clark",
+    email: "christopher.clark@company.com",
+    department: "Sales",
+    role: "Account Manager",
+    salary: 72000,
+    status: "inactive",
+    hireDate: "2022-03-30",
+  },
+  {
+    id: 14,
+    name: "Amanda Lewis",
+    email: "amanda.lewis@company.com",
+    department: "Design",
+    role: "Graphic Designer",
+    salary: 67000,
+    status: "active",
+    hireDate: "2021-12-10",
+  },
+  {
+    id: 15,
+    name: "Daniel Walker",
+    email: "daniel.walker@company.com",
+    department: "Engineering",
+    role: "Mobile Developer",
+    salary: 80000,
+    status: "active",
+    hireDate: "2022-08-22",
+  },
 ];
 
 const productData: Product[] = [
@@ -130,6 +232,14 @@ export const TableExample: React.FC = () => {
   const [employeeSort, setEmployeeSort] = useState<
     { column: string; direction: "asc" | "desc" } | undefined
   >();
+  const [employeePage, setEmployeePage] = useState(1);
+  const [employeePageSize, setEmployeePageSize] = useState<{
+    value: string;
+    label: string;
+  }>({
+    value: "5",
+    label: "5 per page",
+  });
 
   const [productSelection, setProductSelection] = useState<
     SelectionState<Product>
@@ -140,6 +250,31 @@ export const TableExample: React.FC = () => {
   const [productSort, setProductSort] = useState<
     { column: string; direction: "asc" | "desc" } | undefined
   >();
+  const [productPage, setProductPage] = useState(1);
+  const productPageSize = 3;
+
+  // Pagination logic for employees
+  const employeeItemsPerPage = parseInt(employeePageSize.value);
+  const employeeTotalPages = Math.ceil(
+    employeeData.length / employeeItemsPerPage
+  );
+  const paginatedEmployeeData = useMemo(() => {
+    const startIndex = (employeePage - 1) * employeeItemsPerPage;
+    return employeeData.slice(startIndex, startIndex + employeeItemsPerPage);
+  }, [employeePage, employeeItemsPerPage]);
+
+  // Pagination logic for products
+  const productTotalPages = Math.ceil(productData.length / productPageSize);
+  const paginatedProductData = useMemo(() => {
+    const startIndex = (productPage - 1) * productPageSize;
+    return productData.slice(startIndex, startIndex + productPageSize);
+  }, [productPage]);
+
+  const pageSizeOptions = [
+    { value: "5", label: "5 per page" },
+    { value: "10", label: "10 per page" },
+    { value: "15", label: "15 per page" },
+  ];
   const handleEmployeeAction = (action: string, employee: Employee) => {
     console.log(`${action} action for employee:`, employee.name);
   };
@@ -205,123 +340,156 @@ export const TableExample: React.FC = () => {
               )}
           </div>
 
-          <Table
-            data={employeeData}
-            selection={{
-              mode: "multiple",
-              selectedRows: employeeSelection.selectedRows,
-              onSelectionChange: setEmployeeSelection,
-              getRowId: (row) => row.id,
-            }}
-            sortable
-            sort={employeeSort}
-            onSortChange={(column, direction) =>
-              setEmployeeSort({ column, direction })
-            }
-            striped
-            hoverable
-            size="default"
-            className="border border-gray-200 rounded-lg"
-            onRowClick={(row) => console.log("Row clicked:", row.name)}
-          >
-            {({ Column }) => (
-              <>
-                <Column
-                  id="name"
-                  header="Name"
-                  name="name"
-                  width="200px"
-                  sticky="left"
-                  sortable
-                  render={({ row: employee }: { row: Employee }) => (
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-sm font-medium">
-                        {employee.name
-                          .split(" ")
-                          .map((n: string) => n[0])
-                          .join("")}
-                      </div>
-                      <div>
-                        <div className="font-medium">{employee.name}</div>
-                        <div className="text-sm text-gray-500">
-                          {employee.email}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <p className="text-sm text-muted-foreground">
+                Showing {(employeePage - 1) * employeeItemsPerPage + 1} to{" "}
+                {Math.min(
+                  employeePage * employeeItemsPerPage,
+                  employeeData.length
+                )}{" "}
+                of {employeeData.length} employees
+              </p>
+              <div className="w-40">
+                <Select
+                  options={pageSizeOptions}
+                  value={employeePageSize}
+                  onValueChange={(value) => {
+                    setEmployeePageSize(value!);
+                    setEmployeePage(1); // Reset to first page when page size changes
+                  }}
+                  size="sm"
+                />
+              </div>
+            </div>
+
+            <Table
+              data={paginatedEmployeeData}
+              selection={{
+                mode: "multiple",
+                selectedRows: employeeSelection.selectedRows,
+                onSelectionChange: setEmployeeSelection,
+                getRowId: (row) => row.id,
+              }}
+              sortable
+              sort={employeeSort}
+              onSortChange={(column, direction) =>
+                setEmployeeSort({ column, direction })
+              }
+              striped
+              hoverable
+              size="default"
+              className="border border-gray-200 rounded-lg"
+              onRowClick={(row) => console.log("Row clicked:", row.name)}
+            >
+              {({ Column }) => (
+                <>
+                  <Column
+                    id="name"
+                    header="Name"
+                    name="name"
+                    width="200px"
+                    sticky="left"
+                    sortable
+                    render={({ row: employee }: { row: Employee }) => (
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-sm font-medium">
+                          {employee.name
+                            .split(" ")
+                            .map((n: string) => n[0])
+                            .join("")}
+                        </div>
+                        <div>
+                          <div className="font-medium">{employee.name}</div>
+                          <div className="text-sm text-gray-500">
+                            {employee.email}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  )}
-                />
-                <Column
-                  id="department"
-                  header="Department"
-                  name="department"
-                  width="150px"
-                  sortable
-                />
-                <Column
-                  id="role"
-                  header="Role"
-                  name="role"
-                  width="180px"
-                  sortable
-                />
-                <Column
-                  id="salary"
-                  header="Salary"
-                  name="salary"
-                  width="120px"
-                  align="right"
-                  sortable
-                  render={({ value }) => formatCurrency(value)}
-                />
-                <Column
-                  id="status"
-                  header="Status"
-                  name="status"
-                  width="100px"
-                  render={({ value }) => getStatusBadge(value)}
-                />
-                <Column
-                  id="hireDate"
-                  header="Hire Date"
-                  name="hireDate"
-                  width="120px"
-                  sortable
-                  render={({ value }) => formatDate(value)}
-                />
-                <Column
-                  id="actions"
-                  header="Actions"
-                  width="100px"
-                  sticky="right"
-                  render={({ row: employee }: { row: Employee }) => (
-                    <IconMenuDropdown
-                      variant="primary"
-                      items={[
-                        {
-                          label: "View",
-                          onClick: () => handleEmployeeAction("view", employee),
-                          icon: <Eye className="h-4 w-4" />,
-                        },
-                        {
-                          label: "Edit",
-                          onClick: () => handleEmployeeAction("edit", employee),
-                          icon: <Edit className="h-4 w-4" />,
-                        },
-                        { type: "separator" },
-                        {
-                          label: "Delete",
-                          onClick: () =>
-                            handleEmployeeAction("delete", employee),
-                          icon: <Trash2 className="h-4 w-4" />,
-                          destructive: true,
-                        },
-                      ]}
-                    />
-                  )}
-                />
-              </>
-            )}
-          </Table>
+                    )}
+                  />
+                  <Column
+                    id="department"
+                    header="Department"
+                    name="department"
+                    width="150px"
+                    sortable
+                  />
+                  <Column
+                    id="role"
+                    header="Role"
+                    name="role"
+                    width="180px"
+                    sortable
+                  />
+                  <Column
+                    id="salary"
+                    header="Salary"
+                    name="salary"
+                    width="120px"
+                    align="right"
+                    sortable
+                    render={({ value }) => formatCurrency(value)}
+                  />
+                  <Column
+                    id="status"
+                    header="Status"
+                    name="status"
+                    width="100px"
+                    render={({ value }) => getStatusBadge(value)}
+                  />
+                  <Column
+                    id="hireDate"
+                    header="Hire Date"
+                    name="hireDate"
+                    width="120px"
+                    sortable
+                    render={({ value }) => formatDate(value)}
+                  />
+                  <Column
+                    id="actions"
+                    header="Actions"
+                    width="100px"
+                    sticky="right"
+                    render={({ row: employee }: { row: Employee }) => (
+                      <IconMenuDropdown
+                        variant="primary"
+                        items={[
+                          {
+                            label: "View",
+                            onClick: () =>
+                              handleEmployeeAction("view", employee),
+                            icon: <Eye className="h-4 w-4" />,
+                          },
+                          {
+                            label: "Edit",
+                            onClick: () =>
+                              handleEmployeeAction("edit", employee),
+                            icon: <Edit className="h-4 w-4" />,
+                          },
+                          { type: "separator" },
+                          {
+                            label: "Delete",
+                            onClick: () =>
+                              handleEmployeeAction("delete", employee),
+                            icon: <Trash2 className="h-4 w-4" />,
+                            destructive: true,
+                          },
+                        ]}
+                      />
+                    )}
+                  />
+                </>
+              )}
+            </Table>
+
+            <Pagination
+              currentPage={employeePage}
+              totalPages={employeeTotalPages}
+              onPageChange={setEmployeePage}
+              className="mt-4"
+            />
+          </div>
         </div>
 
         <div className="space-y-4 mt-8">
@@ -344,113 +512,132 @@ export const TableExample: React.FC = () => {
             )}
           </div>
 
-          <Table
-            data={productData}
-            selection={{
-              mode: "single",
-              selectedRow: productSelection.selectedRow,
-              onSelectionChange: setProductSelection,
-              getRowId: (row) => row.id,
-            }}
-            sortable
-            sort={productSort}
-            onSortChange={(column, direction) =>
-              setProductSort({ column, direction })
-            }
-            bordered
-            size="sm"
-            className="max-w-4xl"
-          >
-            {({ Column }) => (
-              <>
-                <Column
-                  id="id"
-                  header="Product ID"
-                  name="id"
-                  width="120px"
-                  sortable
-                  cellClassName="font-mono text-xs"
-                />
-                <Column
-                  id="name"
-                  header="Product Name"
-                  name="name"
-                  minWidth="200px"
-                  sortable
-                  render={({ row: product }: { row: Product }) => (
-                    <div>
-                      <div className="font-medium">{product.name}</div>
-                      <div className="text-xs text-gray-500">
-                        {product.category}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <p className="text-sm text-muted-foreground">
+                Showing {(productPage - 1) * productPageSize + 1} to{" "}
+                {Math.min(productPage * productPageSize, productData.length)} of{" "}
+                {productData.length} products
+              </p>
+            </div>
+
+            <Table
+              data={paginatedProductData}
+              selection={{
+                mode: "single",
+                selectedRow: productSelection.selectedRow,
+                onSelectionChange: setProductSelection,
+                getRowId: (row) => row.id,
+              }}
+              sortable
+              sort={productSort}
+              onSortChange={(column, direction) =>
+                setProductSort({ column, direction })
+              }
+              bordered
+              size="sm"
+              className="max-w-4xl"
+            >
+              {({ Column }) => (
+                <>
+                  <Column
+                    id="id"
+                    header="Product ID"
+                    name="id"
+                    width="120px"
+                    sortable
+                    cellClassName="font-mono text-xs"
+                  />
+                  <Column
+                    id="name"
+                    header="Product Name"
+                    name="name"
+                    minWidth="200px"
+                    sortable
+                    render={({ row: product }: { row: Product }) => (
+                      <div>
+                        <div className="font-medium">{product.name}</div>
+                        <div className="text-xs text-gray-500">
+                          {product.category}
+                        </div>
                       </div>
-                    </div>
-                  )}
-                />
-                <Column
-                  id="price"
-                  header="Price"
-                  name="price"
-                  width="100px"
-                  align="right"
-                  sortable
-                  render={({ value }) => formatCurrency(value)}
-                />
-                <Column
-                  id="stock"
-                  header="Stock"
-                  name="stock"
-                  width="80px"
-                  align="center"
-                  sortable
-                  render={({ value }) => (
-                    <span
-                      className={value === 0 ? "text-red-600 font-medium" : ""}
-                    >
-                      {value}
-                    </span>
-                  )}
-                />
-                <Column
-                  id="status"
-                  header="Status"
-                  name="status"
-                  width="120px"
-                  render={({ value }) => getStatusBadge(value)}
-                />
-                <Column
-                  id="lastUpdated"
-                  header="Last Updated"
-                  name="lastUpdated"
-                  width="120px"
-                  sortable
-                  render={({ value }) => formatDate(value)}
-                />
-                <Column
-                  id="actions"
-                  header="Actions"
-                  width="100px"
-                  render={({ row: product }: { row: Product }) => (
-                    <div className="flex gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleProductAction("edit", product)}
+                    )}
+                  />
+                  <Column
+                    id="price"
+                    header="Price"
+                    name="price"
+                    width="100px"
+                    align="right"
+                    sortable
+                    render={({ value }) => formatCurrency(value)}
+                  />
+                  <Column
+                    id="stock"
+                    header="Stock"
+                    name="stock"
+                    width="80px"
+                    align="center"
+                    sortable
+                    render={({ value }) => (
+                      <span
+                        className={
+                          value === 0 ? "text-red-600 font-medium" : ""
+                        }
                       >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleProductAction("delete", product)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  )}
-                />
-              </>
-            )}
-          </Table>
+                        {value}
+                      </span>
+                    )}
+                  />
+                  <Column
+                    id="status"
+                    header="Status"
+                    name="status"
+                    width="120px"
+                    render={({ value }) => getStatusBadge(value)}
+                  />
+                  <Column
+                    id="lastUpdated"
+                    header="Last Updated"
+                    name="lastUpdated"
+                    width="120px"
+                    sortable
+                    render={({ value }) => formatDate(value)}
+                  />
+                  <Column
+                    id="actions"
+                    header="Actions"
+                    width="100px"
+                    render={({ row: product }: { row: Product }) => (
+                      <div className="flex gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleProductAction("edit", product)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleProductAction("delete", product)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    )}
+                  />
+                </>
+              )}
+            </Table>
+
+            <Pagination
+              currentPage={productPage}
+              totalPages={productTotalPages}
+              onPageChange={setProductPage}
+              className="mt-4"
+            />
+          </div>
         </div>
 
         <div className="space-y-4 mt-8">

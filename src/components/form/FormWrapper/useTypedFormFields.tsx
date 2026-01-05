@@ -5,6 +5,7 @@ import { FormCheckbox } from '../FormCheckbox';
 import { FormRadioGroup } from '../FormRadioGroup';
 import { FormTextarea } from '../FormTextArea';
 import { FormNumberInput } from '../FormNumberInput';
+import { FormDatePicker } from '../FormDatePicker';
 
 export function useTypedFormFields<T extends FieldValues>() {
   const context = useFormContext<T>();
@@ -18,5 +19,6 @@ export function useTypedFormFields<T extends FieldValues>() {
     FormRadioGroup: FormRadioGroup<T>,
     FormTextarea: FormTextarea<T>,
     FormNumberInput: FormNumberInput<T>,
+    FormDatePicker: FormDatePicker<T>,
   };
 }

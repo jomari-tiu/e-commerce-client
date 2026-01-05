@@ -7,7 +7,9 @@ export { FormCheckbox } from './FormCheckbox';
 export { FormRadioGroup } from './FormRadioGroup';
 export { FormTextarea } from './FormTextArea';
 export { FormNumberInput } from './FormNumberInput';
+export { FormDatePicker } from './FormDatePicker';
 
 export { useTypedFormFields } from './FormWrapper/useTypedFormFields';
 
 export { ComprehensiveFormExample } from './FormExample';
+export { FormDatePickerExample } from './FormDatePickerExample';

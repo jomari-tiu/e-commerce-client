@@ -192,15 +192,16 @@ function CalendarDayButton({
       data-range-end={modifiers.range_end}
       data-range-middle={modifiers.range_middle}
       className={cn(
-        "h-9 aspect-square font-normal aria-selected:opacity-100 rounded-md",
-        "data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground data-[selected=true]:hover:bg-primary data-[selected=true]:hover:text-primary-foreground",
-        "data-[today=true]:bg-accent data-[today=true]:text-accent-foreground data-[today=true]:font-semibold data-[today=true]:ring-2 data-[today=true]:ring-primary data-[today=true]:ring-offset-0",
-        "data-[selected=true][data-today=true]:bg-primary data-[selected=true][data-today=true]:text-primary-foreground data-[selected=true][data-today=true]:ring-2 data-[selected=true][data-today=true]:ring-accent data-[selected=true][data-today=true]:font-semibold",
+        "h-9 aspect-square font-normal aria-selected:opacity-100 rounded-md transition-colors duration-150",
+        "hover:bg-accent hover:text-accent-foreground",
+        "data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground data-[selected=true]:hover:bg-primary/90 data-[selected=true]:hover:text-primary-foreground",
+        "data-[today=true]:bg-accent data-[today=true]:text-accent-foreground data-[today=true]:font-semibold data-[today=true]:ring-2 data-[today=true]:ring-primary data-[today=true]:ring-offset-0 data-[today=true]:hover:bg-accent/80",
+        "data-[selected=true][data-today=true]:bg-primary data-[selected=true][data-today=true]:text-primary-foreground data-[selected=true][data-today=true]:ring-2 data-[selected=true][data-today=true]:ring-accent data-[selected=true][data-today=true]:font-semibold data-[selected=true][data-today=true]:hover:bg-primary/90",
         "data-[outside=true]:text-muted-foreground data-[outside=true]:opacity-50 data-[outside=true]:hover:bg-accent data-[outside=true]:hover:text-accent-foreground data-[outside=true]:hover:opacity-100",
-        "data-[disabled=true]:text-muted-foreground data-[disabled=true]:opacity-50",
-        "data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground data-[range-end=true]:hover:bg-primary data-[range-end=true]:hover:text-primary-foreground data-[range-end=true]:focus:bg-primary data-[range-end=true]:focus:text-primary-foreground",
-        "data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground data-[range-start=true]:hover:bg-primary data-[range-start=true]:hover:text-primary-foreground data-[range-start=true]:focus:bg-primary data-[range-start=true]:focus:text-primary-foreground",
-        "data-[range-middle=true]:bg-accent data-[range-middle=true]:text-accent-foreground data-[range-middle=true]:hover:bg-accent data-[range-middle=true]:hover:text-accent-foreground data-[range-middle=true]:focus:bg-accent data-[range-middle=true]:focus:text-accent-foreground",
+        "data-[disabled=true]:text-muted-foreground data-[disabled=true]:opacity-50 data-[disabled=true]:cursor-not-allowed data-[disabled=true]:hover:bg-transparent data-[disabled=true]:hover:text-muted-foreground",
+        "data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground data-[range-end=true]:hover:bg-primary/90 data-[range-end=true]:hover:text-primary-foreground data-[range-end=true]:focus:bg-primary data-[range-end=true]:focus:text-primary-foreground",
+        "data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground data-[range-start=true]:hover:bg-primary/90 data-[range-start=true]:hover:text-primary-foreground data-[range-start=true]:focus:bg-primary data-[range-start=true]:focus:text-primary-foreground",
+        "data-[range-middle=true]:bg-accent data-[range-middle=true]:text-accent-foreground data-[range-middle=true]:hover:bg-accent/80 data-[range-middle=true]:hover:text-accent-foreground data-[range-middle=true]:focus:bg-accent data-[range-middle=true]:focus:text-accent-foreground",
         className
       )}
       {...props}

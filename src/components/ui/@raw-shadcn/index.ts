@@ -5,6 +5,7 @@ export * from './calendar';
 export * from './popover';
 export * from './separator';
 export * from './switch';
+export * from './tabs';
 export * from './Label';
 export * from './table';
 export * from './textarea';

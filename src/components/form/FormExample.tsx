@@ -23,12 +23,15 @@ const employeeFormSchema = z.object({
   emailNotifications: z.boolean().default(false),
   salary: z.number().min(0, "Salary must be positive").optional(),
   employeeId: z.string().optional(),
+  startDate: z.date({
+    required_error: "Please select a start date",
+  }),
 });
 
 type EmployeeFormData = z.infer<typeof employeeFormSchema>;
 
 const EmployeeFormFields = () => {
-  const { FormInput, FormSelect, FormCheckbox, FormRadioGroup, FormTextarea, FormNumberInput } =
+  const { FormInput, FormSelect, FormCheckbox, FormRadioGroup, FormTextarea, FormNumberInput, FormDatePicker } =
     useTypedFormFields<EmployeeFormData>();
 
   const departmentOptions = [
@@ -99,12 +102,20 @@ const EmployeeFormFields = () => {
           label="Department"
           placeholder="Select a department..."
           options={departmentOptions}
+          returnFullObject={true}
         />
         <FormRadioGroup
           name="employmentType"
           label="Employment Type"
           options={employmentOptions}
           orientation="vertical"
+        />
+        <FormDatePicker
+          name="startDate"
+          label="Start Date"
+          placeholder="Select start date"
+          minDate={new Date()}
+          showClear={true}
         />
         <FormNumberInput
           name="salary"
@@ -197,6 +208,7 @@ export const ComprehensiveFormExample = () => {
           email: "john.doe@example.com",
           department: { value: "engineering", label: "Engineering" },
           employmentType: "fulltime",
+          startDate: new Date(new Date().setDate(new Date().getDate() + 7)), // Default to 1 week from now
           acceptTerms: true,
           phoneNumber: "1234567890",
           bio: "John Doe is a software engineer at Google.",
