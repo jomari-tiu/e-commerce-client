@@ -1,0 +1,323 @@
+import * as React from "react";
+import { format, isAfter, isBefore } from "date-fns";
+import { Calendar as CalendarIcon, X } from "lucide-react";
+import { DateRange } from "react-day-picker";
+
+import { cn } from "@/utils/cn";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "../@raw-shadcn/popover";
+import { Calendar } from "../@raw-shadcn/calendar";
+
+export type DatePickerMode = "single" | "range" | "multiple";
+
+export type DatePickerValue<T extends DatePickerMode> = T extends "single"
+  ? Date | undefined
+  : T extends "range"
+  ? DateRange | undefined
+  : T extends "multiple"
+  ? Date[] | undefined
+  : never;
+
+export type DatePickerFormatOptions = {
+  /** Date format string (default: 'PPP' for single, 'PPP - PPP' for range) */
+  format?: string;
+  /** Return format for onValueChange callback */
+  returnFormat?: "date" | "iso" | "timestamp" | "custom";
+  /** Custom format string when returnFormat is 'custom' */
+  customFormat?: string;
+};
+
+export type DatePickerProps<T extends DatePickerMode = "single"> = {
+  /** Selection mode */
+  mode?: T;
+  /** Current value */
+  value?: DatePickerValue<T>;
+  /** Callback when value changes */
+  onValueChange?: (
+    value: DatePickerValue<T>,
+    formatted?: string | string[]
+  ) => void;
+  /** Placeholder text */
+  placeholder?: string;
+  /** Minimum selectable date */
+  minDate?: Date;
+  /** Maximum selectable date */
+  maxDate?: Date;
+  /** Disabled dates */
+  disabledDates?: Date[] | ((date: Date) => boolean);
+  /** Format options */
+  formatOptions?: DatePickerFormatOptions;
+  /** Show clear button */
+  showClear?: boolean;
+  /** Disabled state */
+  disabled?: boolean;
+  /** Custom className */
+  className?: string;
+  /** Trigger className */
+  triggerClassName?: string;
+  /** Content className */
+  contentClassName?: string;
+  /** Popover align */
+  align?: "start" | "center" | "end";
+  /** Popover side */
+  side?: "top" | "right" | "bottom" | "left";
+  /** Show week numbers */
+  showWeekNumbers?: boolean;
+  /** Allow future dates */
+  allowFuture?: boolean;
+  /** Allow past dates */
+  allowPast?: boolean;
+};
+
+export const DatePicker = <T extends DatePickerMode = "single">({
+  mode = "single" as T,
+  value,
+  onValueChange,
+  placeholder,
+  minDate,
+  maxDate,
+  disabledDates,
+  formatOptions = {},
+  showClear = true,
+  disabled = false,
+  className,
+  triggerClassName,
+  contentClassName,
+  align = "start",
+  side = "bottom",
+  showWeekNumbers = false,
+  allowFuture = true,
+  allowPast = true,
+  ...props
+}: DatePickerProps<T>) => {
+  const [isOpen, setIsOpen] = React.useState(false);
+
+  const {
+    format: formatString,
+    returnFormat = "date",
+    customFormat,
+  } = formatOptions;
+
+  // Format value for display
+  const formatDisplayValue = React.useCallback(
+    (val: DatePickerValue<T>): string => {
+      if (!val) return "";
+
+      const displayFormat =
+        formatString || (mode === "range" ? "PPP - PPP" : "PPP");
+
+      try {
+        if (mode === "single" && val instanceof Date) {
+          return format(val, displayFormat);
+        }
+
+        if (
+          mode === "range" &&
+          val &&
+          typeof val === "object" &&
+          "from" in val
+        ) {
+          const range = val as DateRange;
+          if (range.from && range.to) {
+            return `${format(range.from, "PPP")} - ${format(range.to, "PPP")}`;
+          } else if (range.from) {
+            return format(range.from, "PPP");
+          }
+        }
+
+        if (mode === "multiple" && Array.isArray(val)) {
+          return val.map((date) => format(date, "PPP")).join(", ");
+        }
+      } catch (error) {
+        console.warn("DatePicker: Error formatting display value:", error);
+      }
+
+      return "";
+    },
+    [mode, formatString]
+  );
+
+  // Format value for callback
+  const formatReturnValue = React.useCallback(
+    (val: DatePickerValue<T>) => {
+      if (!val) return undefined;
+
+      try {
+        switch (returnFormat) {
+          case "iso":
+            if (mode === "single" && val instanceof Date) {
+              return val.toISOString();
+            }
+            if (mode === "range" && typeof val === "object" && "from" in val) {
+              const range = val as DateRange;
+              return {
+                from: range.from?.toISOString(),
+                to: range.to?.toISOString(),
+              };
+            }
+            if (mode === "multiple" && Array.isArray(val)) {
+              return val.map((date) => date.toISOString());
+            }
+            break;
+
+          case "timestamp":
+            if (mode === "single" && val instanceof Date) {
+              return val.getTime();
+            }
+            if (mode === "range" && typeof val === "object" && "from" in val) {
+              const range = val as DateRange;
+              return {
+                from: range.from?.getTime(),
+                to: range.to?.getTime(),
+              };
+            }
+            if (mode === "multiple" && Array.isArray(val)) {
+              return val.map((date) => date.getTime());
+            }
+            break;
+
+          case "custom":
+            if (!customFormat) break;
+            if (mode === "single" && val instanceof Date) {
+              return format(val, customFormat);
+            }
+            if (mode === "range" && typeof val === "object" && "from" in val) {
+              const range = val as DateRange;
+              return {
+                from: range.from ? format(range.from, customFormat) : undefined,
+                to: range.to ? format(range.to, customFormat) : undefined,
+              };
+            }
+            if (mode === "multiple" && Array.isArray(val)) {
+              return val.map((date) => format(date, customFormat));
+            }
+            break;
+
+          case "date":
+          default:
+            return val;
+        }
+      } catch (error) {
+        console.warn("DatePicker: Error formatting return value:", error);
+      }
+
+      return val;
+    },
+    [mode, returnFormat, customFormat]
+  );
+
+  // Check if date is disabled
+  const isDateDisabled = React.useCallback(
+    (date: Date): boolean => {
+      if (!allowPast && isBefore(date, new Date())) return true;
+      if (!allowFuture && isAfter(date, new Date())) return true;
+      if (minDate && isBefore(date, minDate)) return true;
+      if (maxDate && isAfter(date, maxDate)) return true;
+
+      if (disabledDates) {
+        if (Array.isArray(disabledDates)) {
+          return disabledDates.some(
+            (disabledDate) =>
+              format(date, "yyyy-MM-dd") === format(disabledDate, "yyyy-MM-dd")
+          );
+        } else if (typeof disabledDates === "function") {
+          return disabledDates(date);
+        }
+      }
+
+      return false;
+    },
+    [allowPast, allowFuture, minDate, maxDate, disabledDates]
+  );
+
+  // Handle date selection
+  const handleSelect = React.useCallback(
+    (selectedValue: Date | DateRange | Date[] | undefined) => {
+      if (!onValueChange) return;
+
+      const typedValue = selectedValue as DatePickerValue<T>;
+      const formattedValue = formatReturnValue(typedValue);
+
+      onValueChange(typedValue, formattedValue as string | string[]);
+
+      // Close popover for single mode
+      if (mode === "single" && selectedValue) {
+        setIsOpen(false);
+      }
+    },
+    [mode, onValueChange, formatReturnValue]
+  );
+
+  // Handle clear
+  const handleClear = React.useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (onValueChange) {
+        onValueChange(undefined as DatePickerValue<T>, undefined as any);
+      }
+    },
+    [onValueChange]
+  );
+
+  const displayValue = value ? formatDisplayValue(value) : "";
+  const hasValue = Boolean(displayValue);
+
+  return (
+    <div className={cn("relative", className)}>
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <PopoverTrigger asChild>
+          <div className="relative">
+            <div className="relative flex items-center">
+              <div className="absolute left-3 z-10 flex items-center justify-center text-gray-500 pointer-events-none">
+                <CalendarIcon className="h-4 w-4" />
+              </div>
+              <input
+                readOnly
+                disabled={disabled}
+                value={hasValue ? displayValue : ""}
+                placeholder={placeholder || "Pick a date"}
+                className={cn(
+                  "flex h-10 py-2 w-full rounded-md border border-gray-300 bg-background text-base ring-offset-background placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50 md:text-sm cursor-pointer",
+                  "pl-10",
+                  hasValue && showClear && !disabled ? "pr-10" : "pr-3",
+                  !hasValue && "text-muted-foreground",
+                  triggerClassName
+                )}
+                onClick={() => !disabled && setIsOpen(true)}
+                {...props}
+              />
+              {hasValue && showClear && !disabled && (
+                <div className="absolute right-3 z-10 flex items-center justify-center">
+                  <X
+                    className="h-4 w-4 opacity-50 hover:opacity-100 transition-opacity cursor-pointer"
+                    onClick={handleClear}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        </PopoverTrigger>
+        <PopoverContent
+          className={cn("w-auto p-0", contentClassName)}
+          align={align}
+          side={side}
+        >
+          <Calendar
+            mode={mode as any}
+            selected={value as any}
+            onSelect={handleSelect as any}
+            disabled={isDateDisabled}
+            initialFocus
+            showWeekNumber={showWeekNumbers}
+            numberOfMonths={mode === "range" ? 2 : 1}
+          />
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
+};
+
+DatePicker.displayName = "DatePicker";
