@@ -23,3 +23,4 @@ export * from './@raw-shadcn/Toast';
 export * from './Toast/useToast';
 export { Toaster } from './Toast/Toaster';
 export * from './Pagination';
+export { WorkInProgress } from './WorkInProgress';

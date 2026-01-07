@@ -6,7 +6,7 @@ import { Separator, Toaster, useToast } from "./ui";
 import { ComprehensiveFormExample, FormDatePickerExample } from "./form";
 import CheckboxExample from "./ui/Checkbox/CheckboxExample";
 import { DatePickerExample } from "./ui/DatePicker/DatePickerExample";
-import { DatePickerClearTest } from "./DatePickerClearTest";
+import { DatePickerClearTest } from "./ui/DatePicker/DatePickerClearTest";
 import { TableExample } from "./ui/Table/TableExample";
 import { SheetExample } from "./ui/Sheet/SheetExample";
 import { SelectExample } from "./ui/Select/SelectExample";
@@ -473,7 +473,11 @@ const InputsSection = () => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="textarea">Message</Label>
-              <Textarea id="textarea" placeholder="Enter your message" rows={4} />
+              <Textarea
+                id="textarea"
+                placeholder="Enter your message"
+                rows={4}
+              />
             </div>
             <div className="flex items-center space-x-2">
               <Switch id="notifications" />
@@ -635,10 +639,10 @@ const DatePickersSection = () => {
         </p>
       </div>
 
-      <Card 
+      <Card
         title="Clear Button Test"
         description="Test the clear button functionality - click X to clear"
-        content={<DatePickerClearTest />} 
+        content={<DatePickerClearTest />}
       />
 
       <Card content={<DatePickerExample />} />
@@ -721,7 +725,8 @@ const PaginationSection = () => {
       <div>
         <h2 className="text-3xl font-bold text-foreground mb-2">Pagination</h2>
         <p className="text-muted-foreground">
-          Pagination components for navigating through multiple pages of content.
+          Pagination components for navigating through multiple pages of
+          content.
         </p>
       </div>
 

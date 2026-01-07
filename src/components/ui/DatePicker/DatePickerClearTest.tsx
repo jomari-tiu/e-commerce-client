@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { SingleDatePicker } from './ui/DatePicker';
-import { Card } from './ui/@raw-shadcn/card';
+import { useState } from "react";
+import { SingleDatePicker } from ".";
+import { Card } from "../@raw-shadcn/card";
 
 export const DatePickerClearTest = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -15,15 +15,18 @@ export const DatePickerClearTest = () => {
             <SingleDatePicker
               value={date}
               onValueChange={(newDate) => {
-                console.log('Date changed:', newDate);
+                console.log("Date changed:", newDate);
                 setDate(newDate);
               }}
               placeholder="Select a date"
               showClear={true}
             />
             <div className="text-sm text-gray-600">
-              <p>Current value: {date ? date.toLocaleDateString() : 'No date selected'}</p>
-              <p>Value type: {date ? typeof date : 'undefined'}</p>
+              <p>
+                Current value:{" "}
+                {date ? date.toLocaleDateString() : "No date selected"}
+              </p>
+              <p>Value type: {date ? typeof date : "undefined"}</p>
             </div>
             <button
               onClick={() => setDate(new Date())}
@@ -43,4 +46,3 @@ export const DatePickerClearTest = () => {
     </div>
   );
 };
-
