@@ -57,7 +57,7 @@ export type TableProps<T extends TableRowData = TableRowData> = {
     column: string;
     direction: "asc" | "desc";
   };
-  onSortChange?: (column: string, direction: "asc" | "desc") => void;
+  onSortChange?: (column: keyof T, direction: "asc" | "desc") => void;
   bordered?: boolean;
   size?: "sm" | "default" | "lg";
   onRowClick?: (row: T, index: number) => void;

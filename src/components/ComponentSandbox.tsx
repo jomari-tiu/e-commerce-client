@@ -18,6 +18,8 @@ import { TextExample } from "./ui/TextExample";
 import { PaginationExample } from "./ui/Pagination/PaginationExample";
 import SwitchExample from "./ui/Switch/SwitchExample";
 import TabsExample from "./ui/Tabs/TabsExample";
+import { BreadcrumbsExample } from "./ui/Breadcrumbs/BreadcrumbsExample";
+import { ModalExample } from "./ui/Modal/ModalExample";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/@raw-shadcn/avatar";
 import { Label } from "./ui/@raw-shadcn/Label";
 import { Input } from "./ui/Input";
@@ -32,6 +34,7 @@ type ComponentSection =
   | "overview"
   | "buttons"
   | "badges"
+  | "breadcrumbs"
   | "cards"
   | "forms"
   | "inputs"
@@ -43,6 +46,7 @@ type ComponentSection =
   | "datepickers"
   | "tables"
   | "pagination"
+  | "modals"
   | "sheets"
   | "tabs"
   | "toasts"
@@ -56,6 +60,7 @@ const ComponentSandbox = () => {
     { id: "overview", label: "Overview" },
     { id: "buttons", label: "Buttons" },
     { id: "badges", label: "Badges" },
+    { id: "breadcrumbs", label: "Breadcrumbs" },
     { id: "cards", label: "Cards" },
     { id: "forms", label: "Forms" },
     { id: "inputs", label: "Inputs" },
@@ -67,6 +72,7 @@ const ComponentSandbox = () => {
     { id: "datepickers", label: "Date Pickers" },
     { id: "tables", label: "Tables" },
     { id: "pagination", label: "Pagination" },
+    { id: "modals", label: "Modals" },
     { id: "sheets", label: "Sheets" },
     { id: "tabs", label: "Tabs" },
     { id: "toasts", label: "Toasts" },
@@ -81,6 +87,8 @@ const ComponentSandbox = () => {
         return <ButtonsSection />;
       case "badges":
         return <BadgesSection />;
+      case "breadcrumbs":
+        return <BreadcrumbsSection />;
       case "cards":
         return <CardsSection />;
       case "forms":
@@ -103,6 +111,8 @@ const ComponentSandbox = () => {
         return <TablesSection />;
       case "pagination":
         return <PaginationSection />;
+      case "modals":
+        return <ModalsSection />;
       case "sheets":
         return <SheetsSection />;
       case "tabs":
@@ -179,6 +189,7 @@ const OverviewSection = () => {
             <ul className="space-y-2 text-sm">
               <li>✓ Buttons</li>
               <li>✓ Badges</li>
+              <li>✓ Breadcrumbs</li>
               <li>✓ Cards</li>
               <li>✓ Avatars</li>
               <li>✓ Separators</li>
@@ -209,6 +220,7 @@ const OverviewSection = () => {
             <ul className="space-y-2 text-sm">
               <li>✓ Tables</li>
               <li>✓ Pagination</li>
+              <li>✓ Modals</li>
               <li>✓ Sheets</li>
               <li>✓ Tabs</li>
               <li>✓ Dropdowns</li>
@@ -366,6 +378,23 @@ const BadgesSection = () => {
           </div>
         }
       />
+    </div>
+  );
+};
+
+// Breadcrumbs Section
+const BreadcrumbsSection = () => {
+  return (
+    <div className="space-y-8">
+      <div>
+        <h2 className="text-3xl font-bold text-foreground mb-2">Breadcrumbs</h2>
+        <p className="text-muted-foreground">
+          Breadcrumb navigation components for showing the current page
+          location.
+        </p>
+      </div>
+
+      <BreadcrumbsExample />
     </div>
   );
 };
@@ -731,6 +760,22 @@ const PaginationSection = () => {
       </div>
 
       <Card content={<PaginationExample />} />
+    </div>
+  );
+};
+
+// Modals Section
+const ModalsSection = () => {
+  return (
+    <div className="space-y-8">
+      <div>
+        <h2 className="text-3xl font-bold text-foreground mb-2">Modals</h2>
+        <p className="text-muted-foreground">
+          Modal components for overlaying content and user interactions.
+        </p>
+      </div>
+
+      <ModalExample />
     </div>
   );
 };

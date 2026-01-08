@@ -1,8 +1,8 @@
-import * as React from 'react';
+import * as React from "react";
 
-import { cn } from '@/utils/cn';
+import { cn } from "@/utils/cn";
 
-export interface InputProps extends React.ComponentProps<'input'> {
+export interface InputProps extends React.ComponentProps<"input"> {
   leadingIcon?: React.ReactNode;
   trailingIcon?: React.ReactNode;
   debounce?: number;
@@ -17,6 +17,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       trailingIcon,
       debounce,
       onChange,
+      value,
       ...props
     },
     ref
@@ -26,16 +27,27 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
     // Debounce implementation
     const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+    const [internalValue, setInternalValue] = React.useState(value);
+
+    // Sync internal value with external value prop
+    React.useEffect(() => {
+      setInternalValue(value);
+    }, [value]);
 
     const handleChange = React.useCallback(
       (event: React.ChangeEvent<HTMLInputElement>) => {
+        const newValue = event.target.value;
+
         if (debounce && onChange) {
+          // Update internal state immediately for visual feedback
+          setInternalValue(newValue);
+
           // Clear previous timeout
           if (timeoutRef.current) {
             clearTimeout(timeoutRef.current);
           }
 
-          // Set new timeout
+          // Set new timeout for debounced callback
           timeoutRef.current = setTimeout(() => {
             onChange(event);
           }, debounce);
@@ -67,17 +79,18 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             autoComplete="off"
             type={type}
             className={cn(
-              'flex h-10 py-2 text-black w-full rounded-md border border-gray-300 bg-background text-base ring-offset-background placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+              "flex h-10 py-2 text-black w-full rounded-md border border-gray-300 bg-background text-base ring-offset-background placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
               hasLeadingIcon
-                ? 'pl-10 pr-3'
+                ? "pl-10 pr-3"
                 : hasTrailingIcon
-                  ? 'pl-3 pr-10'
-                  : 'px-3',
-              hasLeadingIcon && hasTrailingIcon && 'px-10',
+                  ? "pl-3 pr-10"
+                  : "px-3",
+              hasLeadingIcon && hasTrailingIcon && "px-10",
               className
             )}
             ref={ref}
             {...props}
+            value={debounce ? internalValue : value}
             onChange={handleChange}
           />
           {hasTrailingIcon && (
@@ -94,16 +107,17 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         autoComplete="off"
         type={type}
         className={cn(
-          'flex h-10 px-3 py-2 w-full rounded-md border border-gray-300 bg-background text-base ring-offset-background placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+          "flex h-10 px-3 py-2 w-full rounded-md border border-gray-300 bg-background text-base ring-offset-background placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
           className
         )}
         ref={ref}
         {...props}
+        value={debounce ? internalValue : value}
         onChange={handleChange}
       />
     );
   }
 );
-Input.displayName = 'Input';
+Input.displayName = "Input";
 
 export { Input };

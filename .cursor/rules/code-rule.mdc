@@ -2,7 +2,7 @@
 alwaysApply: true
 ---
 
-# Co-location Pattern Rules for HRIS Project
+# Co-location Pattern Rules
 
 ## Core Principle
 
@@ -27,24 +27,27 @@ When in doubt → Start LOCAL, move when needed
 ### 2. Folder Structure
 
 ```
-pages/[feature-name]/
+src/pages/[feature-name]/
 ├── _page.tsx           # Main page component (required)
 ├── components/         # Components ONLY used in this page
 ├── hooks/              # Hooks ONLY used in this page
 ├── utils/              # Utils/helpers ONLY used in this page
-├── schemas.ts          # Zod validation schemas
+├── schemas.ts          # Validation schemas (Zod, etc.)
 └── types.ts            # TypeScript types
 ```
 
 ### 3. Shared Folders Usage
 
-Only use these for code used in 2+ features:
+Only use these for code used in 2+ features. Adjust folder names based on your project structure:
 
-- `components/` - Shared UI components (Button, Input, etc.)
-- `hooks/` - Shared custom hooks (useAuth, useToast, etc.)
-- `utils/` - Shared utility functions
-- `lib/` - Third-party library configurations
-- `types/` - Shared TypeScript types
+- `src/components/ui/` - Shared UI components (Button, Input, Table, etc.)
+- `src/components/form/` - Shared form components (if using form library)
+- `src/components/[category]/` - Other shared component categories as needed
+- `src/hooks/` - Shared custom hooks (useAuth, useToast, etc.)
+- `src/utils/` - Shared utility functions
+- `src/lib/` - Third-party library configurations and API functions
+- `src/routes/` - Route definitions (if using route files)
+- `src/types/` - Shared TypeScript types (if needed)
 
 ### 4. Naming Conventions
 
@@ -53,7 +56,7 @@ Only use these for code used in 2+ features:
 - Hooks: `useHookName.ts` (camelCase with 'use' prefix)
 - Utils: `utilName.ts` or `helpers.ts` (camelCase)
 - Types: `types.ts` or `TypeName.ts`
-- Schemas: `schemas.ts`
+- Schemas: `schemas.ts` (validation schemas if using validation library)
 
 ## Decision Tree
 
@@ -61,23 +64,23 @@ When creating a new file, ask:
 
 **Is it a component?**
 
-- Used in 1 place? → `pages/[feature]/components/ComponentName.tsx`
-- Used in 2+ places? → `components/ui/ComponentName.tsx`
+- Used in 1 place? → `src/pages/[feature]/components/ComponentName.tsx`
+- Used in 2+ places? → `src/components/ui/ComponentName.tsx` (for UI) or appropriate shared component folder
 
 **Is it a hook?**
 
-- Used in 1 place? → `pages/[feature]/hooks/useHookName.ts`
-- Used in 2+ places? → `hooks/useHookName.ts`
+- Used in 1 place? → `src/pages/[feature]/hooks/useHookName.ts`
+- Used in 2+ places? → `src/hooks/useHookName.ts`
 
 **Is it a utility/helper?**
 
-- Used in 1 place? → `pages/[feature]/utils/utilName.ts`
-- Used in 2+ places? → `utils/utilName.ts`
+- Used in 1 place? → `src/pages/[feature]/utils/utilName.ts`
+- Used in 2+ places? → `src/utils/utilName.ts`
 
 **Is it a type/interface?**
 
-- Used in 1 place? → `pages/[feature]/types.ts`
-- Used in 2+ places? → `types/TypeName.ts`
+- Used in 1 place? → `src/pages/[feature]/types.ts`
+- Used in 2+ places? → `src/types/TypeName.ts` (if needed, otherwise keep in shared component file)
 
 ## Common Mistakes to Avoid
 
@@ -85,10 +88,10 @@ When creating a new file, ask:
 
 ```typescript
 // BAD: Creating shared util before second usage
-src / utils / formatUserName.ts; // Only used in users page
+src / utils / formatUserName.ts; // Only used in user-profile page
 
 // GOOD: Keep local until needed elsewhere
-src / pages / users / utils / formatUserName.ts;
+src / pages / user - profile / utils / formatUserName.ts;
 ```
 
 ### ❌ DON'T: Type-Based Organization
@@ -96,12 +99,12 @@ src / pages / users / utils / formatUserName.ts;
 ```typescript
 // BAD: Organizing by file type
 src/components/
-  ├── LoginForm.tsx      (only used in login)
-  ├── UserCard.tsx       (only used in users)
+  ├── UserCard.tsx      (only used in user listing)
+  ├── DashboardWidget.tsx (only used in dashboard)
 
 // GOOD: Co-location by feature
-src/pages/login/components/LoginForm.tsx
 src/pages/users/components/UserCard.tsx
+src/pages/dashboard/components/DashboardWidget.tsx
 ```
 
 ### ❌ DON'T: Create Empty Folders
@@ -125,7 +128,7 @@ When generating new features:
 1. **Always create feature folder first**
 
    ```
-   pages/[feature-name]/
+   src/pages/[feature-name]/
    ```
 
 2. **Create \_page.tsx as entry point**
@@ -151,6 +154,10 @@ When generating new features:
    - You can confirm it's used in 2+ features
    - You document where it's used in code comments
 
+6. **Route definitions** (if applicable)
+   - Add routes to appropriate route file based on your routing setup
+   - Use absolute imports for page components
+
 ## Imports
 
 Use absolute imports with @ alias:
@@ -166,37 +173,43 @@ import { Button } from "../../../components/ui/button";
 
 ## Examples
 
-### Example 1: Creating Login Page
+### Example 1: Creating User Profile Page
 
 ```
-pages/login/
-├── _page.tsx                    # Main login page
+src/pages/user-profile/
+├── _page.tsx                    # Main user profile page
 ├── components/
-│   └── LoginForm.tsx            # Form only used in login
-└── schemas.ts                   # Login validation schema
-```
-
-### Example 2: Creating Employee Management
-
-```
-pages/employees/
-├── _page.tsx                    # Employee list page
-├── components/
-│   ├── EmployeeTable.tsx        # Table only used here
-│   ├── EmployeeFilters.tsx      # Filters only used here
-│   └── EmployeeCard.tsx         # Card only used here
+│   ├── ProfileImage.tsx         # Image component only used here
+│   └── ProfileSettings.tsx     # Settings component only used here
 ├── hooks/
-│   └── useEmployees.ts          # Hook only used here
+│   └── useUserProfile.ts        # Hook only used here
+└── schemas.ts                   # Profile validation schema
+```
+
+### Example 2: Creating Dashboard Page
+
+```
+src/pages/dashboard/
+├── _page.tsx                    # Dashboard page
+├── components/
+│   ├── DashboardStats.tsx       # Stats widget only used here
+│   ├── DashboardFilters.tsx     # Filters only used here
+│   └── DashboardChart.tsx       # Chart only used here
+├── hooks/
+│   └── useDashboard.ts          # Hook only used here
 ├── utils/
-│   └── employeeHelpers.ts       # Helpers only used here
-└── schemas.ts                   # Employee validation
+│   └── dashboardHelpers.ts      # Helpers only used here
+└── schemas.ts                   # Dashboard validation
 ```
 
-### Example 3: Shared Component
+### Example 3: Shared Components
 
 ```
-components/ui/
+src/components/ui/
 └── Button.tsx                   # Used in 10+ pages
+
+src/components/form/
+└── FormInput.tsx                # Used in multiple forms (if applicable)
 ```
 
 ## Enforcement
@@ -211,9 +224,14 @@ Before creating any file, verify:
 
 When a local file becomes used in multiple places:
 
-1. Move file from `pages/[feature]/` to appropriate shared folder
-2. Update all imports
-3. Document where it's used in code comments
+1. Move file from `src/pages/[feature]/` to appropriate shared folder
+   - UI components → `src/components/ui/` or appropriate component folder
+   - Hooks → `src/hooks/`
+   - Utils → `src/utils/`
+   - Types → `src/types/` (if needed)
+2. Update all imports across the codebase
+3. Update index.ts files if applicable
+4. Document where it's used in code comments
 
 ## Documentation
 
@@ -222,8 +240,8 @@ Add comments for shared files:
 ```typescript
 /**
  * Shared Button component
- * Used in: Login, Dashboard, Employees, Settings
- * Last updated: 2025-11-16
+ * Used in: Login, Dashboard, UserProfile, Settings
+ * Last updated: 2025-01-XX
  */
 export const Button = () => { ... }
 ```
@@ -264,19 +282,20 @@ When in doubt, start local. It's easier to move a file to shared later than to c
 
 ### Form Handling
 
-- Use React Hook Form with Zod validation
-- Always use FormWrapper component for forms
+- Use React Hook Form with Zod validation (or your preferred form library)
 - Create schemas.ts file for all validation schemas
 - Show field-level errors with proper error messages
 - Disable submit button while form is submitting
+- Use form wrapper component if available in your project
 
 ### API Integration
 
 - Use TanStack Query (React Query) for all API calls
-- Define API functions in lib/[feature]-api.ts files
+- Define API functions in `src/lib/[feature]-api.ts` files
 - Use proper loading and error states
 - Implement optimistic updates where appropriate
 - Cache API responses with appropriate staleTime
+- Handle API errors gracefully with user-friendly messages
 
 ### State Management
 
@@ -288,11 +307,13 @@ When in doubt, start local. It's easier to move a file to shared later than to c
 
 ### Styling Rules
 
-- Use Tailwind CSS for all styling
+- Use Tailwind CSS for all styling (or your preferred CSS solution)
 - Follow mobile-first approach (design for mobile, then desktop)
-- Use the design system colors and spacing from tailwind.config
+- Use the design system colors and spacing from your config file
 - Prefer utility classes over custom CSS
 - Group related utility classes together for readability
+- Use component library base components if applicable (e.g., shadcn/ui)
+- Customize components in shared component folders when needed
 
 ### Code Quality
 
@@ -346,21 +367,23 @@ When in doubt, start local. It's easier to move a file to shared later than to c
 
 ## Project-Specific Rules
 
-### HRIS Application
-
-- Employee data is sensitive - always validate permissions
-- Use proper role-based access control (admin, hr, employee)
-- Implement audit logs for sensitive operations
-- Follow data privacy regulations
-- Validate all employee-related operations server-side
+> **Note:** Customize these sections based on your project's specific requirements. Add or remove sections as needed.
 
 ### Authentication
 
-- Store JWT tokens in localStorage (already implemented)
+- Store authentication tokens securely (localStorage, sessionStorage, or httpOnly cookies)
 - Auto-refresh tokens on 401 responses
 - Clear all auth data on logout
 - Redirect to login on authentication failures
 - Show appropriate loading states during auth operations
+- Implement proper route guards for protected routes
+
+### Routes
+
+- Organize routes based on your routing library (React Router, Next.js, etc.)
+- Separate public and protected routes if applicable
+- Use route guards for authentication/authorization
+- Implement proper route structure based on your project needs
 
 ### Forms and Validation
 
@@ -369,6 +392,7 @@ When in doubt, start local. It's easier to move a file to shared later than to c
 - Disable submit button during API calls
 - Show success messages after successful operations
 - Clear form on successful submission (if appropriate)
+- Use validation schemas (Zod) - define in `schemas.ts` within feature folder
 
 ### UI/UX Guidelines
 
@@ -377,6 +401,18 @@ When in doubt, start local. It's easier to move a file to shared later than to c
 - Use toast notifications for success/error messages
 - Implement proper empty states
 - Add confirmation dialogs for destructive actions
+- Optimize images and assets with lazy loading
+- Implement proper error boundaries
+- Ensure accessibility (a11y) standards
+
+### Data Security
+
+- Always validate permissions on sensitive operations
+- Use proper role-based access control (RBAC) if applicable
+- Never store sensitive data client-side (passwords, payment info, etc.)
+- Validate all operations server-side
+- Use HTTPS for all API calls in production
+- Implement proper data sanitization
 
 ---
 

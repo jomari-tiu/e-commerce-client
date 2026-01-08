@@ -1,3 +1,12 @@
+import PageWrapper from "@/components/ui/PageWrapper";
+
 export default function InventoryManagementPage() {
-  return <div>InventoryManagementPage</div>;
+  return (
+    <PageWrapper
+      title="Inventory Management"
+      description="Manage your inventory"
+    >
+      sdads
+    </PageWrapper>
+  );
 }
