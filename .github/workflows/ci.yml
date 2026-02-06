@@ -1,36 +1,46 @@
-name: CI Pipeline
+name: Production CI Pipeline
 
 on:
-    push:
-        branches: [main]
-    pull_request:
-        branches: [main]
+  push:
+    branches: [develop, main]
+  pull_request:
+    branches: [develop, main]
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
+  ci:
+    name: CI Checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
 
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
+    steps:
+      # 1. Checkout repository
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-            - name: Setup Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: 22
-                  cache: "npm"
+      # 2. Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
 
-            - name: Install dependencies
-              run: npm ci
+      # 3. Install dependencies
+      - name: Install dependencies
+        run: npm ci
 
-            - name: Lint
-              run: npm run lint
+      # 4. Lint (ALL branches)
+      - name: Lint code
+        run: npm run lint
 
-            - name: Type check
-              run: npm run type-check
+      # 5. Type check (ALL branches)
+      - name: Type check
+        run: npm run type-check
 
-            - name: Run tests
-              run: npm test -- --watch=false
+      # 6. Unit tests (develop + main)
+      - name: Run unit tests
+        run: npm test -- --watch=false
 
-            - name: Build
-              run: npm run build
+      # 7. Production build (MAIN only)
+      - name: Build for production
+        if: github.ref == 'refs/heads/main'
+        run: npm run build
