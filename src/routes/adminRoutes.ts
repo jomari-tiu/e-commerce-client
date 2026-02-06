@@ -8,9 +8,14 @@ import {
   MdInventory,
   MdOutlinePointOfSale,
   MdSettings,
+  MdPeople,
 } from "react-icons/md";
 import InventoryManagementPage from "@/pages/admin/inventory-management/_page";
-import { WorkInProgress } from "@/components";
+import OrderManagementPage from "@/pages/admin/order-management/_page";
+import POSPage from "@/pages/admin/pos/_page";
+import StaffManagementPage from "@/pages/admin/staff-management/_page";
+import SettingsPage from "@/pages/admin/settings/_page";
+import DashboardPage from "@/pages/admin/dashboard/_page";
 import ComponentSandbox from "@/components/ComponentSandbox";
 
 type SidebarMenuItem = RouteObject & {
@@ -23,7 +28,7 @@ export const adminRoutesConfig: SidebarMenuItem[] = [
     label: "Dashboard",
     Icon: AiFillHome,
     path: "/admin/dashboard",
-    Component: WorkInProgress,
+    Component: DashboardPage,
   },
   {
     label: "Products",
@@ -41,19 +46,25 @@ export const adminRoutesConfig: SidebarMenuItem[] = [
     label: "Orders",
     Icon: MdBorderColor,
     path: "/admin/orders",
-    Component: WorkInProgress,
+    Component: OrderManagementPage,
   },
   {
     label: "POS",
     Icon: MdOutlinePointOfSale,
     path: "/admin/pos",
-    Component: WorkInProgress,
+    Component: POSPage,
+  },
+  {
+    label: "Staff",
+    Icon: MdPeople,
+    path: "/admin/staff",
+    Component: StaffManagementPage,
   },
   {
     label: "Settings",
     Icon: MdSettings,
     path: "/admin/settings",
-    Component: WorkInProgress,
+    Component: SettingsPage,
   },
   {
     label: "Sandbox",

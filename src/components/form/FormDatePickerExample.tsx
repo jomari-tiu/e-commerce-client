@@ -3,7 +3,7 @@ import { useState } from 'react';
 import FormWrapper from './FormWrapper/FormWrapper';
 import { useTypedFormFields } from './FormWrapper/useTypedFormFields';
 import { Button, useToast } from '../ui';
-import { DateRange } from 'react-day-picker';
+import type { DateRange as _DateRange } from 'react-day-picker';
 
 // Schema for single date example
 const singleDateFormSchema = z.object({

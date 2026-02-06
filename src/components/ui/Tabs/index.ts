@@ -1,4 +1,3 @@
-export * from './Tabs';
-export * from './TabsExample';
-export * from '../@raw-shadcn/tabs';
+export { Tabs, type TabsProps, type TabItem } from './Tabs';
+export { default as TabsExample } from './TabsExample';
 

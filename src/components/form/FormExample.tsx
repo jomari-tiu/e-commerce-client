@@ -31,8 +31,15 @@ const employeeFormSchema = z.object({
 type EmployeeFormData = z.infer<typeof employeeFormSchema>;
 
 const EmployeeFormFields = () => {
-  const { FormInput, FormSelect, FormCheckbox, FormRadioGroup, FormTextarea, FormNumberInput, FormDatePicker } =
-    useTypedFormFields<EmployeeFormData>();
+  const {
+    FormInput,
+    FormSelect,
+    FormCheckbox,
+    FormRadioGroup,
+    FormTextarea,
+    FormNumberInput,
+    FormDatePicker,
+  } = useTypedFormFields<EmployeeFormData>();
 
   const departmentOptions = [
     { value: "engineering", label: "Engineering" },
@@ -62,7 +69,6 @@ const EmployeeFormFields = () => {
 
   return (
     <>
-      {/* Personal Information Section */}
       <div className="bg-gray-50 p-6 rounded-lg">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">
           Personal Information
