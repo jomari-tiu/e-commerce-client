@@ -1,11 +1,28 @@
 import { Modal, useToast } from "@/components";
-import { ProductFormType } from "../types/productFormSchema";
+
+type ProductType = {
+  id: string;
+  name: string;
+  description: string;
+  shortDescription: string;
+  category: string;
+  brand: string;
+  sku: string;
+  basePrice: number;
+  images: string[];
+  isActive: boolean;
+  isFeatured: boolean;
+  tags: string[];
+  weight: number;
+  variants: any[];
+  totalStock?: number;
+};
 
 type Props = {
-  product: ProductFormType | null;
+  product: ProductType | null;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-  onDelete: (product: ProductFormType) => void;
+  onDelete: (product: ProductType) => void;
 };
 
 export default function DeleteConfirmationModal({

@@ -106,8 +106,6 @@ export const reducer = (state: State, action: Action): State => {
     case "DISMISS_TOAST": {
       const { toastId } = action;
 
-      // ! Side effects ! - This could be extracted into a dismissToast() action,
-      // but I'll keep it here for simplicity
       if (toastId) {
         const toast = state.toasts.find((t) => t.id === toastId);
         addToRemoveQueue(toastId, toast?.duration);
@@ -179,10 +177,9 @@ function toast({ duration = TOAST_REMOVE_DELAY, ...props }: Toast) {
     },
   });
 
-  // Auto-dismiss after duration (unless loading or duration is 0)
   if (!props.loading && duration > 0) {
     setTimeout(() => {
-      addToRemoveQueue(id, 1000); // Give 1 second for exit animation
+      addToRemoveQueue(id, 1000);
     }, duration - 1000);
   }
 
@@ -193,7 +190,6 @@ function toast({ duration = TOAST_REMOVE_DELAY, ...props }: Toast) {
   };
 }
 
-// Convenience methods for different toast variants
 function success(
   title: string,
   description?: string,
@@ -261,7 +257,7 @@ function loading(
     title,
     description,
     loading: true,
-    duration: 0, // Don't auto-dismiss loading toasts
+    duration: 0,
     ...options,
   });
 }

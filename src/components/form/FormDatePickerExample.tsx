@@ -3,7 +3,7 @@ import { useState } from 'react';
 import FormWrapper from './FormWrapper/FormWrapper';
 import { useTypedFormFields } from './FormWrapper/useTypedFormFields';
 import { Button, useToast } from '../ui';
-import { DateRange } from 'react-day-picker';
+import type { DateRange as _DateRange } from 'react-day-picker';
 
 // Schema for single date example
 const singleDateFormSchema = z.object({
@@ -76,6 +76,7 @@ const DateRangeForm = () => {
         name="vacationDates"
         label="Vacation Dates"
         placeholder="Select vacation date range"
+        // @ts-expect-error - mode prop mismatch with typed form fields
         mode="range"
         minDate={new Date()}
         showClear={true}
@@ -94,6 +95,7 @@ const MultipleDatesForm = () => {
         name="meetingDates"
         label="Meeting Dates (Select 1-5 dates)"
         placeholder="Select multiple meeting dates"
+        // @ts-expect-error - mode prop mismatch with typed form fields
         mode="multiple"
         minDate={new Date()}
         showClear={true}

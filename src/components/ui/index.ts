@@ -1,4 +1,3 @@
-// shadcn/ui components
 export * from "./@raw-shadcn/avatar";
 export * from "./badge";
 export * from "./Breadcrumbs";

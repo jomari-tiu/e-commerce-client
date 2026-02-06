@@ -20,7 +20,7 @@ const CardBase = React.forwardRef<
 CardBase.displayName = 'CardBase';
 
 // Props-based Card component
-export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface CardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title' | 'content'> {
   title?: ReactNode;
   description?: ReactNode;
   content?: ReactNode;

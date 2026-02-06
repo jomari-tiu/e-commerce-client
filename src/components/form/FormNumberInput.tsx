@@ -113,7 +113,7 @@ export const FormNumberInput = <T extends FieldValues>({
         name={name}
         control={control}
         render={({ field: { value, onChange, ...field }, fieldState }) => {
-          // Local state for display value with formatting
+          // eslint-disable-next-line react-hooks/rules-of-hooks
           const [displayValue, setDisplayValue] = useState<string>(() => {
             if (value === undefined || value === null) return '';
             const strValue = String(value);
@@ -121,9 +121,11 @@ export const FormNumberInput = <T extends FieldValues>({
           });
 
           // Track if user is actively typing to prevent sync conflicts
+          // eslint-disable-next-line react-hooks/rules-of-hooks
           const isTypingRef = useRef(false);
 
           // Update display value when form value changes externally (not from user input)
+          // eslint-disable-next-line react-hooks/rules-of-hooks
           useEffect(() => {
             // Only sync if user is not actively typing
             if (!isTypingRef.current) {

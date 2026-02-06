@@ -1,4 +1,3 @@
-// Raw shadcn components - direct wrappers of Radix UI primitives
 export * from "./avatar";
 export * from "./breadcrumb";
 export * from "./card";
@@ -10,8 +9,6 @@ export * from "./tabs";
 export * from "./Label";
 export * from "./table";
 export * from "./textarea";
-
-// Nested raw components
 export * from "./Checkbox";
 export * from "./Select";
 export * from "./RadioButton";

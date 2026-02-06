@@ -23,11 +23,7 @@ const sizeClasses = {
   lg: 'h-7 w-14 data-[state=checked]:bg-primary data-[state=unchecked]:bg-gray-300',
 };
 
-const thumbSizeClasses = {
-  sm: 'h-4 w-4 data-[state=checked]:translate-x-4 data-[state=unchecked]:translate-x-0',
-  default: 'h-5 w-5 data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0',
-  lg: 'h-6 w-6 data-[state=checked]:translate-x-7 data-[state=unchecked]:translate-x-0',
-};
+let switchIdCounter = 0;
 
 export const Switch = React.forwardRef<
   React.ElementRef<typeof ShadSwitch>,
@@ -51,7 +47,10 @@ export const Switch = React.forwardRef<
     },
     ref
   ) => {
-    const switchId = id || `switch-${name || Math.random()}`;
+    const switchId = React.useMemo(() => 
+      id || `switch-${name || ++switchIdCounter}`,
+      [id, name]
+    );
 
     return (
       <div
