@@ -24,6 +24,12 @@ type InventoryItem = {
   restockedBy: string;
 };
 
+type InventoryFilter = {
+  search: string;
+  sortBy: string;
+  orderBy: "asc" | "desc";
+};
+
 type StockMovement = {
   id: string;
   productName: string;
@@ -185,15 +191,19 @@ export default function InventoryManagementPage() {
   const [selectedMovement, setSelectedMovement] = useState<StockMovement | null>(null);
   const [showRestockModal, setShowRestockModal] = useState(false);
   const [showAdjustmentModal, setShowAdjustmentModal] = useState(false);
-  const [filters, setFilters] = useState<{
-    search: string;
-    sortBy: string;
-    orderBy: "asc" | "desc";
-  }>({
+  const [filters, setFilters] = useState<InventoryFilter>({
     search: "",
     sortBy: "productName",
     orderBy: "asc",
   });
+
+  const handleFiltersChange = (newFilters: any) => {
+    setFilters({
+      search: String(newFilters.search || ""),
+      sortBy: String(newFilters.sortBy || "productName"),
+      orderBy: newFilters.orderBy || "asc",
+    });
+  };
 
   const getStockStatus = (item: InventoryItem) => {
     if (item.availableStock === 0) {
@@ -249,7 +259,7 @@ export default function InventoryManagementPage() {
         <div className="space-y-4">
           <TableFilter
             filters={filters}
-            setFilters={setFilters}
+            setFilters={handleFiltersChange}
             actions={
               <div className="flex gap-2">
                 <Button

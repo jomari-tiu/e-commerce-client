@@ -76,6 +76,7 @@ const DateRangeForm = () => {
         name="vacationDates"
         label="Vacation Dates"
         placeholder="Select vacation date range"
+        // @ts-expect-error - mode prop mismatch with typed form fields
         mode="range"
         minDate={new Date()}
         showClear={true}
@@ -94,6 +95,7 @@ const MultipleDatesForm = () => {
         name="meetingDates"
         label="Meeting Dates (Select 1-5 dates)"
         placeholder="Select multiple meeting dates"
+        // @ts-expect-error - mode prop mismatch with typed form fields
         mode="multiple"
         minDate={new Date()}
         showClear={true}
