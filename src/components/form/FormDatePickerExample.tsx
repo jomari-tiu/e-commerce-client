@@ -1,21 +1,19 @@
-import { z } from 'zod';
-import { useState } from 'react';
-import FormWrapper from './FormWrapper/FormWrapper';
-import { useTypedFormFields } from './FormWrapper/useTypedFormFields';
-import { Button, useToast } from '../ui';
-import type { DateRange as _DateRange } from 'react-day-picker';
+import { z } from "zod";
+import { useState } from "react";
+import FormWrapper from "./FormWrapper/FormWrapper";
+import { useTypedFormFields } from "./FormWrapper/useTypedFormFields";
+import { Button, useToast } from "../ui";
+import type { DateRange as _DateRange } from "react-day-picker";
 
-// Schema for single date example
 const singleDateFormSchema = z.object({
   birthDate: z.date({
-    required_error: 'Please select your birth date',
+    required_error: "Please select your birth date",
   }),
   appointmentDate: z.date().optional(),
 });
 
 type SingleDateFormData = z.infer<typeof singleDateFormSchema>;
 
-// Schema for date range example
 const dateRangeFormSchema = z.object({
   vacationDates: z
     .object({
@@ -23,23 +21,21 @@ const dateRangeFormSchema = z.object({
       to: z.date().optional(),
     })
     .refine((data) => data.from !== undefined, {
-      message: 'Please select a start date',
+      message: "Please select a start date",
     }),
 });
 
 type DateRangeFormData = z.infer<typeof dateRangeFormSchema>;
 
-// Schema for multiple dates example
 const multipleDatesFormSchema = z.object({
   meetingDates: z
     .array(z.date())
-    .min(1, 'Please select at least one meeting date')
-    .max(5, 'You can select up to 5 meeting dates'),
+    .min(1, "Please select at least one meeting date")
+    .max(5, "You can select up to 5 meeting dates"),
 });
 
 type MultipleDatesFormData = z.infer<typeof multipleDatesFormSchema>;
 
-// Single Date Form
 const SingleDateForm = () => {
   const { FormDatePicker } = useTypedFormFields<SingleDateFormData>();
 
@@ -66,7 +62,6 @@ const SingleDateForm = () => {
   );
 };
 
-// Date Range Form
 const DateRangeForm = () => {
   const { FormDatePicker } = useTypedFormFields<DateRangeFormData>();
 
@@ -85,7 +80,6 @@ const DateRangeForm = () => {
   );
 };
 
-// Multiple Dates Form
 const MultipleDatesForm = () => {
   const { FormDatePicker } = useTypedFormFields<MultipleDatesFormData>();
 
@@ -111,24 +105,24 @@ export const FormDatePickerExample = () => {
   const handleSingleDateSubmit = async (data: SingleDateFormData) => {
     setIsLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log('Single date form:', data);
-    success('Success!', 'Single date form submitted successfully!');
+    console.log("Single date form:", data);
+    success("Success!", "Single date form submitted successfully!");
     setIsLoading(false);
   };
 
   const handleDateRangeSubmit = async (data: DateRangeFormData) => {
     setIsLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log('Date range form:', data);
-    success('Success!', 'Date range form submitted successfully!');
+    console.log("Date range form:", data);
+    success("Success!", "Date range form submitted successfully!");
     setIsLoading(false);
   };
 
   const handleMultipleDatesSubmit = async (data: MultipleDatesFormData) => {
     setIsLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log('Multiple dates form:', data);
-    success('Success!', 'Multiple dates form submitted successfully!');
+    console.log("Multiple dates form:", data);
+    success("Success!", "Multiple dates form submitted successfully!");
     setIsLoading(false);
   };
 
@@ -137,11 +131,11 @@ export const FormDatePickerExample = () => {
       <div>
         <h2 className="text-2xl font-bold mb-4">FormDatePicker Examples</h2>
         <p className="text-gray-600 mb-6">
-          DatePicker integrated with React Hook Form for form validation and state management
+          DatePicker integrated with React Hook Form for form validation and
+          state management
         </p>
       </div>
 
-      {/* Single Date Form */}
       <div className="bg-white border border-gray-200 rounded-lg p-6">
         <h3 className="text-xl font-semibold mb-4">Single Date Selection</h3>
         <FormWrapper
@@ -159,7 +153,6 @@ export const FormDatePickerExample = () => {
         </FormWrapper>
       </div>
 
-      {/* Date Range Form */}
       <div className="bg-white border border-gray-200 rounded-lg p-6">
         <h3 className="text-xl font-semibold mb-4">Date Range Selection</h3>
         <FormWrapper
@@ -177,7 +170,6 @@ export const FormDatePickerExample = () => {
         </FormWrapper>
       </div>
 
-      {/* Multiple Dates Form */}
       <div className="bg-white border border-gray-200 rounded-lg p-6">
         <h3 className="text-xl font-semibold mb-4">Multiple Dates Selection</h3>
         <FormWrapper
@@ -195,7 +187,6 @@ export const FormDatePickerExample = () => {
         </FormWrapper>
       </div>
 
-      {/* Features List */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
         <h3 className="text-lg font-semibold mb-3">Features</h3>
         <ul className="space-y-2 text-sm text-gray-700">
@@ -212,4 +203,3 @@ export const FormDatePickerExample = () => {
     </div>
   );
 };
-

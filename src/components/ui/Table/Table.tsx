@@ -21,7 +21,7 @@ import {
 const TableContext = React.createContext<TableContextType | null>(null);
 
 const extractColumns = <T extends TableRowData = TableRowData>(
-  children: React.ReactElement<ColumnProps<T>>[] | React.ReactNode
+  children: React.ReactElement<ColumnProps<T>>[] | React.ReactNode,
 ): ColumnProps<T>[] => {
   if (!Array.isArray(children)) {
     const childArray = React.Children.toArray(children) as React.ReactElement<
@@ -45,7 +45,7 @@ const extractColumns = <T extends TableRowData = TableRowData>(
 
 const getStickyStyles = (
   sticky: "left" | "right" | false | undefined,
-  offset: string = "0px"
+  offset: string = "0px",
 ) => {
   if (!sticky) return {};
 
@@ -59,7 +59,7 @@ const getStickyStyles = (
 
 const getCellValue = <T extends TableRowData = TableRowData>(
   row: T,
-  name?: keyof T | ((row: T) => any)
+  name?: keyof T | ((row: T) => any),
 ): any => {
   if (!name) return "";
   if (typeof name === "function") {
@@ -86,13 +86,13 @@ const SelectionColumn = <T extends TableRowData = TableRowData>({
       data.length > 0 &&
       data.every((row) =>
         selection.selectedRows?.some(
-          (selected) => getRowId(selected) === getRowId(row)
-        )
+          (selected) => getRowId(selected) === getRowId(row),
+        ),
       );
     const someSelected = data.some((row) =>
       selection.selectedRows?.some(
-        (selected) => getRowId(selected) === getRowId(row)
-      )
+        (selected) => getRowId(selected) === getRowId(row),
+      ),
     );
 
     const handleSelectAll = (checked: boolean) => {
@@ -108,7 +108,7 @@ const SelectionColumn = <T extends TableRowData = TableRowData>({
           checked={allSelected}
           onCheckedChange={handleSelectAll}
           className={cn(
-            someSelected && !allSelected && "data-[state=checked]:opacity-50"
+            someSelected && !allSelected && "data-[state=checked]:opacity-50",
           )}
         />
       </TableHead>
@@ -136,7 +136,7 @@ const SelectionCell = <T extends TableRowData = TableRowData>({
   if (mode === "multiple") {
     const isSelected =
       selection.selectedRows?.some(
-        (selected) => getRowId(selected) === rowId
+        (selected) => getRowId(selected) === rowId,
       ) ?? false;
 
     const handleSelect = (checked: boolean) => {
@@ -215,7 +215,7 @@ export const Table = <T extends TableRowData = TableRowData>({
 
   const ColumnComponent = React.useCallback((props: ColumnProps<T>) => {
     const existingIndex = columnsRef.current.findIndex(
-      (col) => col.id === props.id
+      (col) => col.id === props.id,
     );
     if (existingIndex >= 0) {
       columnsRef.current[existingIndex] = props;
@@ -247,7 +247,7 @@ export const Table = <T extends TableRowData = TableRowData>({
           ) {
             React.Children.forEach(
               (element.props as any).children,
-              processElement
+              processElement,
             );
           }
         }
@@ -260,7 +260,7 @@ export const Table = <T extends TableRowData = TableRowData>({
         ) {
           React.Children.forEach(
             (childrenResult.props as any).children,
-            processElement
+            processElement,
           );
         } else {
           processElement(childrenResult);
@@ -270,7 +270,7 @@ export const Table = <T extends TableRowData = TableRowData>({
       return extractedColumns;
     } else if (children) {
       console.warn(
-        "Traditional Column children pattern is deprecated. Please use the render prop pattern."
+        "Traditional Column children pattern is deprecated. Please use the render prop pattern.",
       );
       const childArray = Array.isArray(children) ? children : [children];
       return extractColumns(childArray);
@@ -279,8 +279,7 @@ export const Table = <T extends TableRowData = TableRowData>({
   }, [children, ColumnComponent]);
 
   const defaultGetRowId = React.useCallback((row: T, index?: number) => {
-    if ("id" in row && row.id !== undefined) return String(row.id);
-    if ("_id" in row && row._id !== undefined) return String(row._id);
+    if ("uuid" in row && row.uuid !== undefined) return String(row.uuid);
     return String(index || 0);
   }, []);
 
@@ -302,7 +301,7 @@ export const Table = <T extends TableRowData = TableRowData>({
             selectedRows: selection.selectedRows || [],
           }
         : internalSelection,
-    [selection, internalSelection]
+    [selection, internalSelection],
   );
 
   const handleSelectionChange = React.useCallback(
@@ -313,7 +312,7 @@ export const Table = <T extends TableRowData = TableRowData>({
         setInternalSelection(newSelection);
       }
     },
-    [selection]
+    [selection],
   );
 
   const handleSort = React.useCallback(
@@ -324,7 +323,7 @@ export const Table = <T extends TableRowData = TableRowData>({
         sort?.column === columnId && sort.direction === "asc" ? "desc" : "asc";
       onSortChange(columnId, newDirection);
     },
-    [sortable, onSortChange, sort]
+    [sortable, onSortChange, sort],
   );
   const contextValue = React.useMemo(
     () => ({
@@ -350,7 +349,7 @@ export const Table = <T extends TableRowData = TableRowData>({
       onRowClick,
       onRowDoubleClick,
       size,
-    ]
+    ],
   );
 
   const sizeClasses = {
@@ -371,28 +370,28 @@ export const Table = <T extends TableRowData = TableRowData>({
         className={cn(
           "relative w-full flex-grow",
           fillHeight && "h-full flex flex-col",
-          className
+          className,
         )}
       >
         <div
           className={cn(
             "overflow-auto",
             fillHeight && "flex-1",
-            bordered && "border border-gray-200 rounded-lg"
+            bordered && "border border-gray-200 rounded-lg",
           )}
         >
           <BaseTable
             className={cn(
               sizeClasses[size],
               rowSizeClasses[size],
-              tableClassName
+              tableClassName,
             )}
           >
             <TableHeader
               className={cn(
                 "bg-gray-50",
                 headerHeight && `h-[${headerHeight}px]`,
-                headerClassName
+                headerClassName,
               )}
             >
               <TableRow>
@@ -418,7 +417,7 @@ export const Table = <T extends TableRowData = TableRowData>({
                         column.align === "right" && "text-right",
                         canSort &&
                           "cursor-pointer hover:bg-gray-100 select-none",
-                        column.headerClassName
+                        column.headerClassName,
                       )}
                       style={{
                         width: column.width,
@@ -437,7 +436,7 @@ export const Table = <T extends TableRowData = TableRowData>({
                                 "h-3 w-3 -mb-1",
                                 isSorted && sort?.direction === "asc"
                                   ? "text-primary"
-                                  : "text-gray-400"
+                                  : "text-gray-400",
                               )}
                             />
                             <ChevronDown
@@ -445,7 +444,7 @@ export const Table = <T extends TableRowData = TableRowData>({
                                 "h-3 w-3",
                                 isSorted && sort?.direction === "desc"
                                   ? "text-primary"
-                                  : "text-gray-400"
+                                  : "text-gray-400",
                               )}
                             />
                           </div>
@@ -499,7 +498,7 @@ export const Table = <T extends TableRowData = TableRowData>({
                       ? currentSelection.selectedRow &&
                         getRowId(currentSelection.selectedRow, 0) === rowId
                       : currentSelection.selectedRows?.some(
-                          (selected) => getRowId(selected, 0) === rowId
+                          (selected) => getRowId(selected, 0) === rowId,
                         );
 
                   const computedRowClassName =
@@ -515,7 +514,7 @@ export const Table = <T extends TableRowData = TableRowData>({
                         hoverable && "hover:bg-gray-100",
                         isSelected && "bg-blue-50",
                         onRowClick && "cursor-pointer",
-                        computedRowClassName
+                        computedRowClassName,
                       )}
                       style={
                         rowHeight ? { height: `${rowHeight}px` } : undefined
@@ -548,7 +547,7 @@ export const Table = <T extends TableRowData = TableRowData>({
                             className={cn(
                               column.align === "center" && "text-center",
                               column.align === "right" && "text-right",
-                              column.cellClassName
+                              column.cellClassName,
                             )}
                             style={{
                               width: column.width,
@@ -556,7 +555,7 @@ export const Table = <T extends TableRowData = TableRowData>({
                               maxWidth: column.maxWidth,
                               ...getStickyStyles(
                                 column.sticky,
-                                column.stickyOffset
+                                column.stickyOffset,
                               ),
                             }}
                           >

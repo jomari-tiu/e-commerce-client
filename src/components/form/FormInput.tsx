@@ -1,25 +1,18 @@
-/**
- * User Story: As a user filling out a form, I want to enter text, email, password,
- * or numeric data in clearly labeled input fields, so that I can provide the required
- * information efficiently. The input should show validation errors immediately and
- * have appropriate input types for better mobile experience and validation.
- */
-
 import {
   useFormContext,
   Controller,
   FieldPath,
   FieldValues,
-} from 'react-hook-form';
-import { Input, Text } from '../ui';
-import { InputHTMLAttributes } from 'react';
+} from "react-hook-form";
+import { Input, Text } from "../ui";
+import { InputHTMLAttributes } from "react";
 
 type InputFieldProps<T extends FieldValues> = {
   name: FieldPath<T>;
   label?: string;
   placeholder?: string;
   type?: string;
-  autoComplete?: InputHTMLAttributes<HTMLInputElement>['autoComplete'];
+  autoComplete?: InputHTMLAttributes<HTMLInputElement>["autoComplete"];
   disabled?: boolean;
   readOnly?: boolean;
 };
@@ -28,7 +21,7 @@ export const FormInput = <T extends FieldValues>({
   name,
   label,
   placeholder,
-  type = 'text',
+  type = "text",
   autoComplete,
   disabled,
   readOnly,
@@ -57,7 +50,7 @@ export const FormInput = <T extends FieldValues>({
               disabled={disabled}
               readOnly={readOnly}
               className={`w-full rounded border p-2 ${
-                fieldState.error ? 'border-red-500' : 'border-gray-300'
+                fieldState.error ? "border-red-500" : "border-gray-300"
               }`}
             />
             {fieldState.error && (

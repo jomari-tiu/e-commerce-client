@@ -1,17 +1,11 @@
-/**
- * User Story: As a user filling out a form, I want to enter numeric data
- * with support for leading zeros and formatted thousand separators,
- * so that I can input financial values, phone numbers, and IDs clearly.
- */
-
 import {
   useFormContext,
   Controller,
   FieldPath,
   FieldValues,
-} from 'react-hook-form';
-import { Input, Text } from '../ui';
-import { InputHTMLAttributes, useState, useEffect, useRef } from 'react';
+} from "react-hook-form";
+import { Input, Text } from "../ui";
+import { InputHTMLAttributes, useState, useEffect, useRef } from "react";
 
 type NumberInputFieldProps<T extends FieldValues> = {
   name: FieldPath<T>;
@@ -19,7 +13,7 @@ type NumberInputFieldProps<T extends FieldValues> = {
   placeholder?: string;
   allowLeadingZero?: boolean;
   thousandSeperator?: boolean;
-  autoComplete?: InputHTMLAttributes<HTMLInputElement>['autoComplete'];
+  autoComplete?: InputHTMLAttributes<HTMLInputElement>["autoComplete"];
   disabled?: boolean;
   readOnly?: boolean;
 };
@@ -38,58 +32,60 @@ export const FormNumberInput = <T extends FieldValues>({
 
   // Format number with thousand separators
   const formatWithSeparators = (value: string): string => {
-    if (!value) return '';
-    
+    if (!value) return "";
+
     // Split into integer and decimal parts
-    const parts = value.split('.');
+    const parts = value.split(".");
     const integerPart = parts[0];
     const decimalPart = parts[1];
-    
+
     // Add thousand separators to integer part
-    const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    
+    const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
     // Combine with decimal part if exists
-    return decimalPart !== undefined 
+    return decimalPart !== undefined
       ? `${formattedInteger}.${decimalPart}`
       : formattedInteger;
   };
 
   // Remove thousand separators for storage
   const removeFormatting = (value: string): string => {
-    return value.replace(/,/g, '');
+    return value.replace(/,/g, "");
   };
 
   // Validate and clean numeric input
   const cleanNumericInput = (value: string): string => {
     // Allow only digits, single decimal point, and minus sign at start
-    let cleaned = value.replace(/[^\d.-]/g, '');
-    
+    let cleaned = value.replace(/[^\d.-]/g, "");
+
     // Handle minus sign - only allow at the start
-    const hasMinusAtStart = cleaned.startsWith('-');
-    cleaned = cleaned.replace(/-/g, '');
+    const hasMinusAtStart = cleaned.startsWith("-");
+    cleaned = cleaned.replace(/-/g, "");
     if (hasMinusAtStart) {
-      cleaned = '-' + cleaned;
+      cleaned = "-" + cleaned;
     }
-    
+
     // Handle decimal point - only allow one
-    const decimalIndex = cleaned.indexOf('.');
+    const decimalIndex = cleaned.indexOf(".");
     if (decimalIndex !== -1) {
       const beforeDecimal = cleaned.substring(0, decimalIndex);
-      const afterDecimal = cleaned.substring(decimalIndex + 1).replace(/\./g, '');
-      cleaned = beforeDecimal + '.' + afterDecimal;
+      const afterDecimal = cleaned
+        .substring(decimalIndex + 1)
+        .replace(/\./g, "");
+      cleaned = beforeDecimal + "." + afterDecimal;
     }
-    
+
     return cleaned;
   };
 
   // Convert to final value based on allowLeadingZero
   const convertToFinalValue = (value: string): string | number | undefined => {
-    if (value === '' || value === '-' || value === '.') {
+    if (value === "" || value === "-" || value === ".") {
       return undefined;
     }
 
     const cleanValue = removeFormatting(value);
-    
+
     if (allowLeadingZero) {
       // Keep as string to preserve leading zeros
       return cleanValue;
@@ -115,9 +111,11 @@ export const FormNumberInput = <T extends FieldValues>({
         render={({ field: { value, onChange, ...field }, fieldState }) => {
           // eslint-disable-next-line react-hooks/rules-of-hooks
           const [displayValue, setDisplayValue] = useState<string>(() => {
-            if (value === undefined || value === null) return '';
+            if (value === undefined || value === null) return "";
             const strValue = String(value);
-            return thousandSeperator ? formatWithSeparators(strValue) : strValue;
+            return thousandSeperator
+              ? formatWithSeparators(strValue)
+              : strValue;
           });
 
           // Track if user is actively typing to prevent sync conflicts
@@ -130,10 +128,12 @@ export const FormNumberInput = <T extends FieldValues>({
             // Only sync if user is not actively typing
             if (!isTypingRef.current) {
               if (value === undefined || value === null) {
-                setDisplayValue('');
+                setDisplayValue("");
               } else {
                 const strValue = String(value);
-                setDisplayValue(thousandSeperator ? formatWithSeparators(strValue) : strValue);
+                setDisplayValue(
+                  thousandSeperator ? formatWithSeparators(strValue) : strValue,
+                );
               }
             }
             // Reset typing flag after sync
@@ -143,16 +143,18 @@ export const FormNumberInput = <T extends FieldValues>({
           const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             // Mark that user is typing
             isTypingRef.current = true;
-            
+
             const inputValue = e.target.value;
-            
+
             // Clean the input
             const cleaned = cleanNumericInput(removeFormatting(inputValue));
-            
+
             // Update display value with formatting if needed
-            const formatted = thousandSeperator ? formatWithSeparators(cleaned) : cleaned;
+            const formatted = thousandSeperator
+              ? formatWithSeparators(cleaned)
+              : cleaned;
             setDisplayValue(formatted);
-            
+
             // Convert and store the final value
             const finalValue = convertToFinalValue(cleaned);
             onChange(finalValue);
@@ -171,7 +173,7 @@ export const FormNumberInput = <T extends FieldValues>({
                 disabled={disabled}
                 readOnly={readOnly}
                 className={`w-full rounded border p-2 ${
-                  fieldState.error ? 'border-red-500' : 'border-gray-300'
+                  fieldState.error ? "border-red-500" : "border-gray-300"
                 }`}
               />
               {fieldState.error && (
@@ -186,4 +188,3 @@ export const FormNumberInput = <T extends FieldValues>({
     </div>
   );
 };
-

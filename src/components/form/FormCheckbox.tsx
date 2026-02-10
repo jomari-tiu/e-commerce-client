@@ -1,18 +1,11 @@
-/**
- * User Story: As a user filling out a form, I want to check/uncheck boxes for boolean
- * options (like accepting terms, enabling notifications, etc.), so that I can indicate
- * my preferences clearly. The checkbox should show validation errors and integrate
- * seamlessly with form validation.
- */
-
 import {
   useFormContext,
   Controller,
   FieldPath,
   FieldValues,
-} from 'react-hook-form';
-import Checkbox from '../ui/Checkbox/Checkbox';
-import { Text } from '../ui';
+} from "react-hook-form";
+import Checkbox from "../ui/Checkbox/Checkbox";
+import { Text } from "../ui";
 
 type CheckboxFieldProps<T extends FieldValues> = {
   name: FieldPath<T>;
@@ -32,7 +25,7 @@ export const FormCheckbox = <T extends FieldValues>({
   const { control } = useFormContext();
 
   return (
-    <div className={`mb-4 ${className || ''}`}>
+    <div className={`mb-4 ${className || ""}`}>
       <Controller
         name={name}
         control={control}
@@ -44,7 +37,7 @@ export const FormCheckbox = <T extends FieldValues>({
                 checked={field.value || false}
                 onCheckedChange={field.onChange}
                 disabled={disabled}
-                className={fieldState.error ? 'border-red-500' : ''}
+                className={fieldState.error ? "border-red-500" : ""}
               />
               <div className="grid gap-1.5 leading-none">
                 {label && (

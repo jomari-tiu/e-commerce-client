@@ -1,23 +1,16 @@
-/**
- * User Story: As a user filling out a form, I want to select dates using a calendar picker
- * with support for single dates, date ranges, and multiple dates, so that I can provide
- * date information efficiently. The date picker should show validation errors and integrate
- * seamlessly with form validation.
- */
-
 import {
   useFormContext,
   Controller,
   FieldPath,
   FieldValues,
-} from 'react-hook-form';
-import { DateRange } from 'react-day-picker';
-import { DatePicker, DatePickerProps, DatePickerMode } from '../ui/DatePicker';
-import { Text } from '../ui';
+} from "react-hook-form";
+import { DateRange } from "react-day-picker";
+import { DatePicker, DatePickerProps, DatePickerMode } from "../ui/DatePicker";
+import { Text } from "../ui";
 
 type FormDatePickerProps<
   T extends FieldValues,
-  M extends DatePickerMode = 'single'
+  M extends DatePickerMode = "single",
 > = {
   name: FieldPath<T>;
   label?: string;
@@ -29,12 +22,12 @@ type FormDatePickerProps<
   minDate?: Date;
   maxDate?: Date;
   disabledDates?: Date[] | ((date: Date) => boolean);
-  formatOptions?: DatePickerProps<M>['formatOptions'];
+  formatOptions?: DatePickerProps<M>["formatOptions"];
   showClear?: boolean;
   triggerClassName?: string;
   contentClassName?: string;
-  align?: 'start' | 'center' | 'end';
-  side?: 'top' | 'right' | 'bottom' | 'left';
+  align?: "start" | "center" | "end";
+  side?: "top" | "right" | "bottom" | "left";
   showWeekNumbers?: boolean;
   allowFuture?: boolean;
   allowPast?: boolean;
@@ -42,11 +35,11 @@ type FormDatePickerProps<
 
 export const FormDatePicker = <
   T extends FieldValues,
-  M extends DatePickerMode = 'single'
+  M extends DatePickerMode = "single",
 >({
   name,
   label,
-  mode = 'single' as M,
+  mode = "single" as M,
   placeholder,
   disabled = false,
   className,
@@ -66,7 +59,7 @@ export const FormDatePicker = <
   const { control } = useFormContext();
 
   return (
-    <div className={`mb-4 ${className || ''}`}>
+    <div className={`mb-4 ${className || ""}`}>
       {label && (
         <label className="block mb-1 font-medium">
           <Text size="sm" color="accent">
@@ -80,11 +73,11 @@ export const FormDatePicker = <
         render={({ field, fieldState }) => {
           // Type-safe value handling based on mode
           const getValue = () => {
-            if (mode === 'single') {
+            if (mode === "single") {
               return field.value as Date | undefined;
-            } else if (mode === 'range') {
+            } else if (mode === "range") {
               return field.value as DateRange | undefined;
-            } else if (mode === 'multiple') {
+            } else if (mode === "multiple") {
               return field.value as Date[] | undefined;
             }
             return field.value;
@@ -107,7 +100,7 @@ export const FormDatePicker = <
                 showClear={showClear}
                 triggerClassName={
                   fieldState.error
-                    ? `border-red-500 ${triggerClassName || ''}`
+                    ? `border-red-500 ${triggerClassName || ""}`
                     : triggerClassName
                 }
                 contentClassName={contentClassName}
@@ -129,4 +122,3 @@ export const FormDatePicker = <
     </div>
   );
 };
-

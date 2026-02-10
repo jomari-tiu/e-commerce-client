@@ -3,8 +3,8 @@ import {
   Controller,
   FieldPath,
   FieldValues,
-} from 'react-hook-form';
-import { Select, SelectOption, SelectValue } from '../ui/Select';
+} from "react-hook-form";
+import { Select, SelectOption, SelectValue } from "../ui/Select";
 
 type SelectFieldProps<T extends FieldValues> = {
   name: FieldPath<T>;
@@ -13,13 +13,13 @@ type SelectFieldProps<T extends FieldValues> = {
   options: SelectOption[];
   disabled?: boolean;
   className?: string;
-  returnFullObject?: boolean; // If true, returns {value, label} object; if false, returns just the value string
+  returnFullObject?: boolean;
 };
 
 export const FormSelect = <T extends FieldValues>({
   name,
   label,
-  placeholder = 'Select an option...',
+  placeholder = "Select an option...",
   options,
   disabled = false,
   className,
@@ -28,16 +28,18 @@ export const FormSelect = <T extends FieldValues>({
   const { control } = useFormContext();
 
   return (
-    <div className={`mb-4 ${className || ''}`}>
+    <div className={`mb-4 ${className || ""}`}>
       <Controller
         name={name}
         control={control}
         render={({ field, fieldState }) => {
           // Convert the form value to SelectValue object for display
           const selectValue: SelectValue | null = field.value
-            ? typeof field.value === 'string'
+            ? typeof field.value === "string"
               ? (() => {
-                  const option = options.find(opt => opt.value === field.value);
+                  const option = options.find(
+                    (opt) => opt.value === field.value,
+                  );
                   return option
                     ? { value: option.value, label: option.label }
                     : null;
@@ -51,7 +53,7 @@ export const FormSelect = <T extends FieldValues>({
               field.onChange(selectedOption);
             } else {
               // Store only the value string (backward compatibility)
-              field.onChange(selectedOption?.value || '');
+              field.onChange(selectedOption?.value || "");
             }
           };
 
@@ -64,7 +66,7 @@ export const FormSelect = <T extends FieldValues>({
                 value={selectValue}
                 onValueChange={handleChange}
                 disabled={disabled}
-                className={fieldState.error ? 'border-red-500' : ''}
+                className={fieldState.error ? "border-red-500" : ""}
               />
               {fieldState.error && (
                 <p className="text-sm text-red-500 mt-1">

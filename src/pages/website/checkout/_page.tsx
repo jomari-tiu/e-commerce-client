@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 import { Button, Badge } from "@/components";
 import { Card } from "@/components/ui/@raw-shadcn/card";
@@ -9,6 +9,9 @@ import { Separator } from "@/components/ui/@raw-shadcn/separator";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { Package, ArrowLeft, CreditCard, TruckIcon } from "lucide-react";
 import { useToast } from "@/components/ui/Toast/useToast";
+import { useGet } from "@/lib/query";
+import { instance } from "@/lib/query";
+import Cookie from "js-cookie";
 
 type CartItem = {
   id: string;
@@ -21,28 +24,59 @@ type CartItem = {
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
-  const { success } = useToast();
+  const { success, error: showError } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [sessionId, setSessionId] = useState<string | null>(null);
 
-  // Mock cart items
-  const cartItems: CartItem[] = [
-    {
-      id: "1",
-      productName: "Classic T-Shirt",
-      variantDescription: "Size: L, Color: Red",
-      price: 500,
-      quantity: 2,
-      image: "https://placehold.co/80x80",
-    },
-    {
-      id: "2",
-      productName: "Running Shoes",
-      variantDescription: "Size: 10",
-      price: 1450,
-      quantity: 1,
-      image: "https://placehold.co/80x80",
-    },
-  ];
+  // Get or create session ID for guest checkout
+  useEffect(() => {
+    let session = localStorage.getItem("sessionId");
+    if (!session) {
+      session = crypto.randomUUID();
+      localStorage.setItem("sessionId", session);
+    }
+    setSessionId(session);
+  }, []);
+
+  // Fetch cart
+  const { data: cartData, isLoading: cartLoading } = useGet<{
+    success: boolean;
+    data: {
+      items: Array<{
+        uuid: string;
+        product: {
+          name: string;
+          images: string[];
+        };
+        variantSku?: {
+          sku: string;
+          variantCombination: Array<{ type: string; value: string }>;
+        };
+        combinationDisplay?: string;
+        unitPrice: number;
+        quantity: number;
+        subtotal: number;
+      }>;
+      subtotal: number;
+      itemCount: number;
+    };
+  }>({
+    url: "/api/cart",
+    key: ["cart"],
+    params: {},
+    headers: sessionId ? { "x-session-id": sessionId } : {},
+    enabled: !!sessionId,
+  });
+
+  const cartItems: CartItem[] =
+    cartData?.data?.items?.map((item) => ({
+      id: item.uuid,
+      productName: item.product.name,
+      variantDescription: item.combinationDisplay || "",
+      price: item.unitPrice,
+      quantity: item.quantity,
+      image: item.product.images[0] || "https://placehold.co/80x80",
+    })) || [];
 
   const [formData, setFormData] = useState({
     // Customer Info
@@ -61,32 +95,70 @@ export default function CheckoutPage() {
     paymentMethod: "gcash",
   });
 
-  const subtotal = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
+  const subtotal = cartData?.data?.subtotal || 0;
   const shippingFee = subtotal >= 2000 ? 0 : 150;
-  const total = subtotal + shippingFee;
+  const tax = (subtotal - 0) * 0.12; // 12% tax
+  const total = subtotal + shippingFee + tax;
 
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsProcessing(true);
 
-    // Simulate order processing
-    setTimeout(() => {
-      const orderNumber = `ORD-${new Date().getFullYear()}${String(
-        new Date().getMonth() + 1
-      ).padStart(2, "0")}${String(new Date().getDate()).padStart(
-        2,
-        "0"
-      )}-${Math.floor(Math.random() * 10000)
-        .toString()
-        .padStart(5, "0")}`;
-
-      success("Order Placed!", `Your order ${orderNumber} has been confirmed`);
+    if (cartItems.length === 0) {
+      showError("Cart Empty", "Please add items to your cart before checkout");
       setIsProcessing(false);
-      navigate("/orders/track");
-    }, 2000);
+      return;
+    }
+
+    const orderData = {
+      customerInfo: {
+        name: `${formData.firstName} ${formData.lastName}`,
+        email: formData.email,
+        phone: formData.phone,
+      },
+      shippingAddress: {
+        street: formData.street,
+        barangay: formData.barangay,
+        city: formData.city,
+        province: formData.province,
+        postalCode: formData.postalCode,
+        landmark: formData.landmark || undefined,
+      },
+      paymentMethod: formData.paymentMethod === "cod" ? "cash" : (formData.paymentMethod as "gcash" | "cash" | "card"),
+      shippingMethod: "jnt" as const,
+      notes: undefined,
+    };
+
+    try {
+      const token = Cookie.get("_token");
+      const headers: any = {
+        "Content-Type": "application/json",
+      };
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+      if (sessionId) {
+        headers["x-session-id"] = sessionId;
+      }
+
+      const response = await instance.post("/api/orders", orderData, { headers });
+      const order = response.data.data;
+
+      if (order.paymentUrl && formData.paymentMethod === "gcash") {
+        // Redirect to GCash payment
+        window.location.href = order.paymentUrl;
+      } else {
+        success("Order Placed!", `Your order ${order.orderNumber} has been confirmed`);
+        navigate(`/orders/track?orderNumber=${order.orderNumber}`);
+      }
+    } catch (err: any) {
+      showError(
+        "Order Failed",
+        err.response?.data?.message || "Failed to create order. Please try again."
+      );
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const paymentMethods = [
@@ -101,6 +173,42 @@ export default function CheckoutPage() {
       description: "Pay when you receive",
     },
   ];
+
+  if (cartLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <Package className="h-12 w-12 text-primary mx-auto mb-4 animate-pulse" />
+          <p className="text-muted-foreground">Loading cart...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!cartData || cartItems.length === 0) {
+    return (
+      <div className="min-h-screen bg-background">
+        <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur">
+          <div className="container mx-auto px-4 py-4">
+            <Link to="/" className="flex items-center gap-2">
+              <Package className="h-6 w-6 text-primary" />
+              <span className="text-xl font-bold">E-Commerce Store</span>
+            </Link>
+          </div>
+        </header>
+        <div className="container mx-auto px-4 py-8 text-center">
+          <Package className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+          <h2 className="text-2xl font-bold mb-2">Your cart is empty</h2>
+          <p className="text-muted-foreground mb-6">
+            Add some items to your cart before checkout
+          </p>
+          <Link to="/">
+            <Button variant="primary">Continue Shopping</Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -436,6 +544,10 @@ export default function CheckoutPage() {
                             formatCurrency(shippingFee)
                           )}
                         </span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Tax (12%):</span>
+                        <span>{formatCurrency(tax)}</span>
                       </div>
                       <Separator />
                       <div className="flex justify-between font-bold text-lg">

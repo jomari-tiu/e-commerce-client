@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/components/ui";
 
-// Generic type for form wrapper props
 type FormWrapperProps<T extends z.ZodType<any, any, any>> = {
   schema: T;
   defaultValues?: Partial<z.infer<T>>;
@@ -42,7 +41,7 @@ const FormWrapper = <T extends z.ZodType<any, any, any>>({
       console.error("Form submission error:", error);
       showErrorToast(
         "Form Submission Failed",
-        error instanceof Error ? error.message : "An unexpected error occurred"
+        error instanceof Error ? error.message : "An unexpected error occurred",
       );
     }
   };
